@@ -56,38 +56,46 @@
     ul     { list-style: none; }
 
     /* =====================================================
-       PAGE — mobile-first single column, right-aligned
+       PAGE — mobile-first single column
        ===================================================== */
     .page {
       display: flex;
       flex-direction: column;
       align-items: flex-end;
-      gap: 24px;
-      padding: 16px 24px 146px;
+      gap: 16px;
+      padding: 16px 0;
       min-height: 100vh;
       background: var(--bg);
     }
 
     /* =====================================================
-       HEADER — title right, illustration floating left
+       HEADER — full-width flex row: illustration left, title right
        ===================================================== */
     .header {
       display: flex;
-      gap: 17px;
+      gap: 8px;
       align-items: center;
-      justify-content: flex-end;
-      position: relative;
-      width: 250px;
+      height: 92px;
+      padding-right: 16px;
+      width: 100%;
       flex-shrink: 0;
+    }
+    .hero-img-wrap {
+      width: 164px;
+      height: 83.952px;
+      flex-shrink: 0;
+      position: relative;
+      overflow: hidden;
+      mix-blend-mode: multiply;
     }
     .hero-img {
       position: absolute;
-      left: -167px;
-      top: 1px;
-      width: 162px;
-      height: 89px;
-      mix-blend-mode: multiply;
-      object-fit: cover;
+      left: -58.9%;
+      top: -0.05%;
+      width: 165.97%;
+      height: 100.1%;
+      max-width: none;
+      display: block;
     }
     .hero-title {
       font-family: var(--serif-display);
@@ -98,17 +106,28 @@
     }
 
     /* =====================================================
+       FILTER CONTAINER — horizontal padding wrapper
+       ===================================================== */
+    .filter-container {
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      width: 100%;
+    }
+
+    /* =====================================================
        FILTERS PANEL — full-width white card
        ===================================================== */
     .filters-panel {
       background: var(--white);
       border-radius: var(--r-card);
-      padding: 24px;
+      padding: 16px;
       box-shadow: var(--shadow-card);
       display: flex;
       flex-direction: column;
-      gap: 32px;
+      gap: 24px;
       width: 100%;
+      overflow: hidden;
     }
 
     /* =====================================================
@@ -117,12 +136,12 @@
     .filters-inner {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 12px;
     }
     .filter-block {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 4px;
     }
     .filter-header {
       display: flex;
@@ -621,24 +640,29 @@
     .shopping-actions button { flex: 1; }
 
     /* =====================================================
-       BOTTOM NAV — fixed pill
+       NAV CONTAINER — in document flow
+       ===================================================== */
+    .nav-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 8px 16px 0;
+      width: 100%;
+    }
+
+    /* =====================================================
+       BOTTOM NAV — in-flow card (not fixed)
        ===================================================== */
     .nav-mobile {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: calc(100% - 48px);
-      max-width: 392px;
+      width: 100%;
       height: 70px;
       background: var(--white);
-      border-radius: 40px;
+      border-radius: var(--r-card);   /* 16px — rectangular with soft corners */
       box-shadow: var(--shadow-card);
       display: flex;
       align-items: center;
       gap: 16px;
       padding: 11px 13px;
-      z-index: 200;
     }
     .nav-mobile-item {
       display: flex;
@@ -654,14 +678,13 @@
       font-size: 16px;
       cursor: pointer;
       color: var(--text);
-      border-radius: 36px;
+      border-radius: var(--r-btn);    /* 12px */
       white-space: nowrap;
       transition: background var(--transition), color var(--transition);
     }
     .nav-mobile-item.active {
       background: var(--green);
       color: var(--white);
-      border-radius: 28px;
     }
     .nav-mobile-item .nav-icon {
       width: 24px;
@@ -672,7 +695,7 @@
     .nav-mobile-item.active .nav-icon { filter: brightness(0) invert(1); }
     .nav-center-icon {
       height: 48px;
-      width: auto;
+      width: 71px;
       flex-shrink: 0;
       object-fit: contain;
     }
@@ -691,11 +714,11 @@
     #navFav.active .fav-badge { background: rgba(255,255,255,.3); }
 
     /* =====================================================
-       TOAST — above the nav bar
+       TOAST
        ===================================================== */
     .toast {
       position: fixed;
-      bottom: 110px; right: 22px;
+      bottom: 22px; right: 22px;
       background: var(--text);
       color: var(--white);
       padding: 11px 18px;
@@ -726,173 +749,182 @@
 
 <div class="page">
 
-  <!-- HEADER -->
+  <!-- HEADER — illustration left, title right -->
   <div class="header">
-    <img
-      class="hero-img"
-      src="https://www.figma.com/api/mcp/asset/df49a763-2e1d-44fc-a181-5614e5ee5086"
-      alt="Ilustração de um prato com legumes"
-    />
+    <div class="hero-img-wrap">
+      <img
+        class="hero-img"
+        src="https://www.figma.com/api/mcp/asset/41579ad7-c474-44b6-b61d-147b77dfd3f1"
+        alt="Ilustração de um prato com legumes"
+      />
+    </div>
     <h1 class="hero-title">O que vou<br>cozinhar hoje?</h1>
   </div>
 
-  <!-- FILTERS PANEL -->
-  <div class="filters-panel" id="filtersPanel">
+  <!-- FILTER CONTAINER -->
+  <div class="filter-container">
 
-    <!-- Loading -->
-    <div class="loading-state" id="loadingState">
-      <div class="spinner"></div>
-      <p>A pensar em receitas para ti…</p>
-    </div>
+    <!-- FILTERS PANEL -->
+    <div class="filters-panel" id="filtersPanel">
 
-    <!-- Form -->
-    <div id="formCard">
-      <div class="filters-inner">
-
-        <!-- 1. Tempo -->
-        <div class="filter-block">
-          <div class="filter-header">
-            <img
-              class="filter-header-icon"
-              src="https://www.figma.com/api/mcp/asset/d824ee17-ae8e-44cd-bd5d-aa85274edf5f"
-              alt=""
-            />
-            <span class="filter-header-label">Tempo para cozinhar</span>
-          </div>
-          <div class="chip-row" id="tempoGroup">
-            <div class="chip-slider"></div>
-            <button class="chip selected" data-value="15" onclick="selectChip('tempo', this)">15 min</button>
-            <button class="chip" data-value="30" onclick="selectChip('tempo', this)">30 min</button>
-            <button class="chip" data-value="45" onclick="selectChip('tempo', this)">45 min</button>
-            <button class="chip" data-value="60" onclick="selectChip('tempo', this)">+60 min</button>
-          </div>
-        </div>
-
-        <!-- 2. Pessoas -->
-        <div class="filter-block">
-          <div class="filter-header">
-            <img
-              class="filter-header-icon"
-              src="https://www.figma.com/api/mcp/asset/625130d9-abba-4954-a918-290ba97dcf0c"
-              alt=""
-            />
-            <span class="filter-header-label">Nº de pessoas</span>
-          </div>
-          <div class="chip-row" id="pessoasGroup">
-            <div class="chip-slider"></div>
-            <button class="chip selected" data-value="1" onclick="selectChip('pessoas', this)">1</button>
-            <button class="chip" data-value="2" onclick="selectChip('pessoas', this)">2</button>
-            <button class="chip" data-value="3" onclick="selectChip('pessoas', this)">3</button>
-            <button class="chip" data-value="4" onclick="selectChip('pessoas', this)">+4</button>
-          </div>
-        </div>
-
-        <!-- 3. Ingredientes -->
-        <div class="filter-block">
-          <div class="filter-header">
-            <img
-              class="filter-header-icon"
-              src="https://www.figma.com/api/mcp/asset/183e931f-8267-4d29-83c7-a30b3b933119"
-              alt=""
-            />
-            <span class="filter-header-label">Nº de ingredientes</span>
-          </div>
-          <div class="chip-row" id="ingredientesGroup">
-            <div class="chip-slider"></div>
-            <button class="chip selected" data-value="4"  onclick="selectChip('ingredientes', this)">4</button>
-            <button class="chip" data-value="6"  onclick="selectChip('ingredientes', this)">6</button>
-            <button class="chip" data-value="8"  onclick="selectChip('ingredientes', this)">8</button>
-            <button class="chip" data-value="10" onclick="selectChip('ingredientes', this)">+10</button>
-          </div>
-        </div>
-
-        <!-- 4. Restrições -->
-        <div class="filter-block">
-          <div class="filter-header">
-            <img
-              class="filter-header-icon"
-              src="https://www.figma.com/api/mcp/asset/42e75bf3-e527-4347-9ba8-820d13dc3d8b"
-              alt=""
-            />
-            <span class="filter-header-label">Restrições alimentares</span>
-          </div>
-          <div class="restriction-row" id="restricoesGroup">
-            <button class="chip-restriction" data-value="sem lactose"  onclick="toggleCheck(this)">Sem lactose</button>
-            <button class="chip-restriction" data-value="vegano"       onclick="toggleCheck(this)">Vegano</button>
-            <button class="chip-restriction" data-value="vegetariano"  onclick="toggleCheck(this)">Vegetariano</button>
-            <button class="chip-restriction" data-value="sem glúten"   onclick="toggleCheck(this)">Sem gluten</button>
-          </div>
-        </div>
-
-      </div><!-- /filters-inner -->
-
-      <!-- Error -->
-      <div class="error-msg" id="errorMsg" style="margin-top:12px;">
-        ⚠ Selecciona pelo menos o tempo e o número de pessoas.
+      <!-- Loading -->
+      <div class="loading-state" id="loadingState">
+        <div class="spinner"></div>
+        <p>A pensar em receitas para ti…</p>
       </div>
 
-      <!-- Submit -->
-      <button class="btn-submit" style="margin-top:32px;" id="generateBtn" onclick="generateRecipes()">
+      <!-- Form -->
+      <div id="formCard">
+        <div class="filters-inner">
+
+          <!-- 1. Tempo -->
+          <div class="filter-block">
+            <div class="filter-header">
+              <img
+                class="filter-header-icon"
+                src="https://www.figma.com/api/mcp/asset/9af82634-00bd-4d2e-8fa7-e8cc8761eebe"
+                alt=""
+              />
+              <span class="filter-header-label">Tempo para cozinhar</span>
+            </div>
+            <div class="chip-row" id="tempoGroup">
+              <div class="chip-slider"></div>
+              <button class="chip selected" data-value="15" onclick="selectChip('tempo', this)">15 min</button>
+              <button class="chip" data-value="30" onclick="selectChip('tempo', this)">30 min</button>
+              <button class="chip" data-value="45" onclick="selectChip('tempo', this)">45 min</button>
+              <button class="chip" data-value="60" onclick="selectChip('tempo', this)">+60 min</button>
+            </div>
+          </div>
+
+          <!-- 2. Pessoas -->
+          <div class="filter-block">
+            <div class="filter-header">
+              <img
+                class="filter-header-icon"
+                src="https://www.figma.com/api/mcp/asset/7142447b-2564-4341-9d9b-6685585698de"
+                alt=""
+              />
+              <span class="filter-header-label">Nº de pessoas</span>
+            </div>
+            <div class="chip-row" id="pessoasGroup">
+              <div class="chip-slider"></div>
+              <button class="chip selected" data-value="1" onclick="selectChip('pessoas', this)">1</button>
+              <button class="chip" data-value="2" onclick="selectChip('pessoas', this)">2</button>
+              <button class="chip" data-value="3" onclick="selectChip('pessoas', this)">3</button>
+              <button class="chip" data-value="4" onclick="selectChip('pessoas', this)">+4</button>
+            </div>
+          </div>
+
+          <!-- 3. Ingredientes -->
+          <div class="filter-block">
+            <div class="filter-header">
+              <img
+                class="filter-header-icon"
+                src="https://www.figma.com/api/mcp/asset/d9cb3a99-088a-4c72-9061-a2f440111dfe"
+                alt=""
+              />
+              <span class="filter-header-label">Nº de ingredientes</span>
+            </div>
+            <div class="chip-row" id="ingredientesGroup">
+              <div class="chip-slider"></div>
+              <button class="chip selected" data-value="4"  onclick="selectChip('ingredientes', this)">4</button>
+              <button class="chip" data-value="6"  onclick="selectChip('ingredientes', this)">6</button>
+              <button class="chip" data-value="8"  onclick="selectChip('ingredientes', this)">8</button>
+              <button class="chip" data-value="10" onclick="selectChip('ingredientes', this)">+10</button>
+            </div>
+          </div>
+
+          <!-- 4. Restrições -->
+          <div class="filter-block">
+            <div class="filter-header">
+              <img
+                class="filter-header-icon"
+                src="https://www.figma.com/api/mcp/asset/8c062110-46ad-4784-90de-c30c3d70f433"
+                alt=""
+              />
+              <span class="filter-header-label">Restrições alimentares</span>
+            </div>
+            <div class="restriction-row" id="restricoesGroup">
+              <button class="chip-restriction" data-value="sem lactose"  onclick="toggleCheck(this)">Sem lactose</button>
+              <button class="chip-restriction" data-value="vegano"       onclick="toggleCheck(this)">Vegano</button>
+              <button class="chip-restriction" data-value="vegetariano"  onclick="toggleCheck(this)">Vegetariano</button>
+              <button class="chip-restriction" data-value="sem glúten"   onclick="toggleCheck(this)">Sem gluten</button>
+            </div>
+          </div>
+
+        </div><!-- /filters-inner -->
+
+        <!-- Error -->
+        <div class="error-msg" id="errorMsg" style="margin-top:12px;">
+          ⚠ Selecciona pelo menos o tempo e o número de pessoas.
+        </div>
+
+        <!-- Submit -->
+        <button class="btn-submit" style="margin-top:24px;" id="generateBtn" onclick="generateRecipes()">
+          <img
+            class="btn-submit-icon"
+            src="https://www.figma.com/api/mcp/asset/8c29e5eb-5d18-444a-8cc7-704882a2617f"
+            alt=""
+          />
+          Mostrar sugestões
+        </button>
+      </div><!-- /formCard -->
+
+      <!-- Recipes -->
+      <div class="recipes-section" id="recipesSection">
+        <div class="section-header">
+          <span class="section-title">3 sugestões para ti</span>
+          <button class="btn-back" onclick="resetForm()">← Mudar filtros</button>
+        </div>
+        <div class="recipes-grid" id="recipesGrid"></div>
+      </div>
+
+      <!-- Favorites -->
+      <div class="favorites-section" id="favoritesSection">
+        <div class="section-header">
+          <span class="section-title">Os meus favoritos</span>
+        </div>
+        <div class="recipes-grid" id="favoritesGrid"></div>
+        <div id="favEmptyState" style="display:none;">
+          <div class="empty-state">
+            <div class="empty-icon">♡</div>
+            <p>Ainda não tens receitas guardadas.<br>Guarda uma sugestão para aparecer aqui.</p>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /filters-panel -->
+  </div><!-- /filter-container -->
+
+  <!-- NAV CONTAINER — in document flow -->
+  <div class="nav-container">
+    <nav class="nav-mobile">
+      <button class="nav-mobile-item active" id="navHome" onclick="navSwitch('home')">
         <img
-          class="btn-submit-icon"
-          src="https://www.figma.com/api/mcp/asset/4cb37cbc-295b-4a24-9431-b117f1a707ad"
+          class="nav-icon"
+          src="https://www.figma.com/api/mcp/asset/76c411cf-3be1-4098-8092-ea681475098d"
           alt=""
         />
-        Mostrar sugestões
+        Home
       </button>
-    </div><!-- /formCard -->
+      <img
+        class="nav-center-icon"
+        src="https://www.figma.com/api/mcp/asset/3c99e27d-e771-4126-bc02-d73645bf4110"
+        alt=""
+      />
+      <button class="nav-mobile-item" id="navFav" onclick="navSwitch('favoritos')">
+        <img
+          class="nav-icon"
+          src="https://www.figma.com/api/mcp/asset/3a93d99e-e981-460a-bff5-0a77679f703e"
+          alt=""
+        />
+        Favoritos
+        <span class="fav-badge" id="favBadge" data-count=""></span>
+      </button>
+    </nav>
+  </div>
 
-    <!-- Recipes -->
-    <div class="recipes-section" id="recipesSection">
-      <div class="section-header">
-        <span class="section-title">3 sugestões para ti</span>
-        <button class="btn-back" onclick="resetForm()">← Mudar filtros</button>
-      </div>
-      <div class="recipes-grid" id="recipesGrid"></div>
-    </div>
-
-    <!-- Favorites -->
-    <div class="favorites-section" id="favoritesSection">
-      <div class="section-header">
-        <span class="section-title">Os meus favoritos</span>
-      </div>
-      <div class="recipes-grid" id="favoritesGrid"></div>
-      <div id="favEmptyState" style="display:none;">
-        <div class="empty-state">
-          <div class="empty-icon">♡</div>
-          <p>Ainda não tens receitas guardadas.<br>Guarda uma sugestão para aparecer aqui.</p>
-        </div>
-      </div>
-    </div>
-
-  </div><!-- /filters-panel -->
 </div><!-- /page -->
-
-<!-- BOTTOM NAV -->
-<nav class="nav-mobile">
-  <button class="nav-mobile-item active" id="navHome" onclick="navSwitch('home')">
-    <img
-      class="nav-icon"
-      src="https://www.figma.com/api/mcp/asset/7f1744e3-b58e-4e7c-ad45-e484646f24ec"
-      alt=""
-    />
-    Home
-  </button>
-  <img
-    class="nav-center-icon"
-    src="https://www.figma.com/api/mcp/asset/091de83e-e26e-4027-8b61-f390e12305f6"
-    alt=""
-  />
-  <button class="nav-mobile-item" id="navFav" onclick="navSwitch('favoritos')">
-    <img
-      class="nav-icon"
-      src="https://www.figma.com/api/mcp/asset/294e8843-8ca0-450d-b536-3e504a1c67ae"
-      alt=""
-    />
-    Favoritos
-    <span class="fav-badge" id="favBadge" data-count=""></span>
-  </button>
-</nav>
 
 <!-- =====================================================
      MODAL DE DETALHE DA RECEITA
