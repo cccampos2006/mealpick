@@ -63,7 +63,7 @@
       flex-direction: column;
       align-items: flex-end;
       gap: 16px;
-      padding: 16px 0 102px;
+      padding: 16px 0;
       min-height: 100vh;
       background: var(--bg);
     }
@@ -81,8 +81,9 @@
       flex-shrink: 0;
     }
     .hero-img-wrap {
-      flex: 1 0 0;
-      min-width: 1px;
+      width: 164px;
+      height: 83.952px;
+      flex-shrink: 0;
       position: relative;
       overflow: hidden;
       mix-blend-mode: multiply;
@@ -102,8 +103,6 @@
       font-weight: 400;
       line-height: 46px;
       color: var(--brown);
-      width: 252px;
-      flex-shrink: 0;
     }
 
     /* =====================================================
@@ -166,16 +165,33 @@
     }
 
     /* =====================================================
-       CHIPS — pill radio buttons
+       CHIPS — slider radio buttons
        ===================================================== */
     .chip-row {
       display: flex;
       align-items: center;
-      gap: 4px;
+      border-radius: var(--r-chip);
+      position: relative;
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
     }
+    .chip-slider {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 80px;
+      background: var(--green);
+      border-radius: var(--r-chip);
+      box-shadow: 0 2px 8px 0 rgba(0,0,0,0.25);
+      transition: left 0.25s cubic-bezier(0.4,0,0.2,1),
+                  width 0.25s cubic-bezier(0.4,0,0.2,1);
+      pointer-events: none;
+      z-index: 0;
+    }
     .chip {
+      position: relative;
+      z-index: 1;
       height: 40px;
       min-width: 80px;
       padding: 8px 16px;
@@ -185,19 +201,15 @@
       font-family: var(--sans);
       font-size: 14px;
       font-weight: 400;
-      color: #5d5d5d;
+      color: var(--text-dark);
       cursor: pointer;
       white-space: nowrap;
       flex-shrink: 0;
+      transition: color var(--transition);
       line-height: normal;
-      transition: background var(--transition), color var(--transition), box-shadow var(--transition);
     }
-    .chip:hover:not(.selected) { background: rgba(53,77,63,.08); color: var(--text); }
-    .chip.selected {
-      background: var(--green);
-      color: var(--white);
-      box-shadow: 0px 2px 4px rgba(0,0,0,0.25);
-    }
+    .chip:hover:not(.selected) { background: rgba(53,77,63,.08); }
+    .chip.selected { color: var(--white); }
 
     /* =====================================================
        RESTRICTION CHIPS — multi-select with border
@@ -628,14 +640,14 @@
     .shopping-actions button { flex: 1; }
 
     /* =====================================================
-       NAV CONTAINER — fixed to bottom
+       NAV CONTAINER — in document flow
        ===================================================== */
     .nav-container {
-      position: fixed;
-      bottom: 16px;
-      left: 16px;
-      right: 16px;
-      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 8px 16px 0;
+      width: 100%;
     }
 
     /* =====================================================
@@ -706,7 +718,7 @@
        ===================================================== */
     .toast {
       position: fixed;
-      bottom: 102px; right: 22px;
+      bottom: 22px; right: 22px;
       background: var(--text);
       color: var(--white);
       padding: 11px 18px;
@@ -742,7 +754,7 @@
     <div class="hero-img-wrap">
       <img
         class="hero-img"
-        src="https://www.figma.com/api/mcp/asset/e4e1adab-a798-4a0c-a681-5632eb604577"
+        src="https://www.figma.com/api/mcp/asset/41579ad7-c474-44b6-b61d-147b77dfd3f1"
         alt="Ilustração de um prato com legumes"
       />
     </div>
@@ -770,13 +782,14 @@
             <div class="filter-header">
               <img
                 class="filter-header-icon"
-                src="https://www.figma.com/api/mcp/asset/11f94089-38f1-4875-afe5-4ec931dd62af"
+                src="https://www.figma.com/api/mcp/asset/9af82634-00bd-4d2e-8fa7-e8cc8761eebe"
                 alt=""
               />
               <span class="filter-header-label">Tempo para cozinhar</span>
             </div>
             <div class="chip-row" id="tempoGroup">
-<button class="chip selected" data-value="15" onclick="selectChip('tempo', this)">15 min</button>
+              <div class="chip-slider"></div>
+              <button class="chip selected" data-value="15" onclick="selectChip('tempo', this)">15 min</button>
               <button class="chip" data-value="30" onclick="selectChip('tempo', this)">30 min</button>
               <button class="chip" data-value="45" onclick="selectChip('tempo', this)">45 min</button>
               <button class="chip" data-value="60" onclick="selectChip('tempo', this)">+60 min</button>
@@ -788,13 +801,14 @@
             <div class="filter-header">
               <img
                 class="filter-header-icon"
-                src="https://www.figma.com/api/mcp/asset/1ab315b4-26cf-4d90-a187-362e0e4fcddc"
+                src="https://www.figma.com/api/mcp/asset/7142447b-2564-4341-9d9b-6685585698de"
                 alt=""
               />
               <span class="filter-header-label">Nº de pessoas</span>
             </div>
             <div class="chip-row" id="pessoasGroup">
-<button class="chip selected" data-value="1" onclick="selectChip('pessoas', this)">1</button>
+              <div class="chip-slider"></div>
+              <button class="chip selected" data-value="1" onclick="selectChip('pessoas', this)">1</button>
               <button class="chip" data-value="2" onclick="selectChip('pessoas', this)">2</button>
               <button class="chip" data-value="3" onclick="selectChip('pessoas', this)">3</button>
               <button class="chip" data-value="4" onclick="selectChip('pessoas', this)">+4</button>
@@ -806,13 +820,14 @@
             <div class="filter-header">
               <img
                 class="filter-header-icon"
-                src="https://www.figma.com/api/mcp/asset/57211f2c-9005-424b-9910-fd7edc3da4c0"
+                src="https://www.figma.com/api/mcp/asset/d9cb3a99-088a-4c72-9061-a2f440111dfe"
                 alt=""
               />
               <span class="filter-header-label">Nº de ingredientes</span>
             </div>
             <div class="chip-row" id="ingredientesGroup">
-<button class="chip selected" data-value="4"  onclick="selectChip('ingredientes', this)">4</button>
+              <div class="chip-slider"></div>
+              <button class="chip selected" data-value="4"  onclick="selectChip('ingredientes', this)">4</button>
               <button class="chip" data-value="6"  onclick="selectChip('ingredientes', this)">6</button>
               <button class="chip" data-value="8"  onclick="selectChip('ingredientes', this)">8</button>
               <button class="chip" data-value="10" onclick="selectChip('ingredientes', this)">+10</button>
@@ -824,7 +839,7 @@
             <div class="filter-header">
               <img
                 class="filter-header-icon"
-                src="https://www.figma.com/api/mcp/asset/d3cd029d-81b7-4e73-9cfa-a48ae0e66408"
+                src="https://www.figma.com/api/mcp/asset/8c062110-46ad-4784-90de-c30c3d70f433"
                 alt=""
               />
               <span class="filter-header-label">Restrições alimentares</span>
@@ -848,7 +863,7 @@
         <button class="btn-submit" style="margin-top:24px;" id="generateBtn" onclick="generateRecipes()">
           <img
             class="btn-submit-icon"
-            src="https://www.figma.com/api/mcp/asset/18797caa-2df1-4d50-a21c-69883b7e5ce0"
+            src="https://www.figma.com/api/mcp/asset/8c29e5eb-5d18-444a-8cc7-704882a2617f"
             alt=""
           />
           Mostrar sugestões
@@ -887,20 +902,20 @@
       <button class="nav-mobile-item active" id="navHome" onclick="navSwitch('home')">
         <img
           class="nav-icon"
-          src="https://www.figma.com/api/mcp/asset/fc94328c-b698-4408-b4ab-d778fad87265"
+          src="https://www.figma.com/api/mcp/asset/76c411cf-3be1-4098-8092-ea681475098d"
           alt=""
         />
         Home
       </button>
       <img
         class="nav-center-icon"
-        src="https://www.figma.com/api/mcp/asset/d6a94b88-cfcd-49ea-82c1-57b54f00bffd"
+        src="https://www.figma.com/api/mcp/asset/3c99e27d-e771-4126-bc02-d73645bf4110"
         alt=""
       />
       <button class="nav-mobile-item" id="navFav" onclick="navSwitch('favoritos')">
         <img
           class="nav-icon"
-          src="https://www.figma.com/api/mcp/asset/af487b21-db42-44a2-85cb-be5d574bd423"
+          src="https://www.figma.com/api/mcp/asset/3a93d99e-e981-460a-bff5-0a77679f703e"
           alt=""
         />
         Favoritos
@@ -1010,6 +1025,7 @@ function saveFavorites() {
 }
 loadFavorites();
 updateFavBadge();
+initSliders();
 
 // =========================================================
 // NAVEGAÇÃO
@@ -1034,6 +1050,29 @@ function navSwitch(view) {
 }
 
 // =========================================================
+// SLIDER — move a pastilha verde para o chip seleccionado
+// =========================================================
+function moveSlider(row) {
+  const slider   = row.querySelector('.chip-slider');
+  const selected = row.querySelector('.chip.selected');
+  if (!slider || !selected) return;
+  slider.style.left  = selected.offsetLeft + 'px';
+  slider.style.width = selected.offsetWidth + 'px';
+}
+
+function initSliders() {
+  document.querySelectorAll('.chip-row').forEach(row => {
+    const slider = row.querySelector('.chip-slider');
+    if (!slider) return;
+    slider.style.transition = 'none';
+    moveSlider(row);
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      slider.style.transition = '';
+    }));
+  });
+}
+
+// =========================================================
 // CHIPS — selecção única
 // =========================================================
 function selectChip(group, btn) {
@@ -1041,6 +1080,7 @@ function selectChip(group, btn) {
   const row = btn.parentElement;
   row.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
   btn.classList.add('selected');
+  moveSlider(row);
   state[group] = btn.dataset.value;
   hideError();
 }
@@ -1289,6 +1329,12 @@ function resetForm() {
     const chips = row.querySelectorAll('.chip');
     chips.forEach(c => c.classList.remove('selected'));
     if (chips.length) chips[0].classList.add('selected');
+    const slider = row.querySelector('.chip-slider');
+    if (slider) {
+      slider.style.transition = 'none';
+      moveSlider(row);
+      requestAnimationFrame(() => requestAnimationFrame(() => { slider.style.transition = ''; }));
+    }
   });
   document.querySelectorAll('.chip-restriction').forEach(c => c.classList.remove('checked'));
   state.tempo = '15'; state.pessoas = '1';
