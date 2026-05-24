@@ -5,10 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MealPick — O que cozinho hoje?</title>
 
-  <!-- Fontes exactas do Figma -->
-  <!-- Libertinus Serif Display → título hero -->
-  <!-- Inria Serif → labels dos filtros + botão principal -->
-  <!-- Inter → texto dos chips -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link
     href="https://fonts.googleapis.com/css2?family=Inria+Serif:ital,wght@0,300;0,400;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap"
@@ -21,37 +17,26 @@
 
   <style>
     /* =====================================================
-       TOKENS — valores extraídos pixel a pixel do Figma
+       TOKENS
        ===================================================== */
     :root {
-      /* Cores exactas */
-      --bg:           #f4f3ee;   /* fundo geral */
+      --bg:           #f4f3ee;
       --white:        #ffffff;
-      --green:        #354d3f;   /* accent principal — chips seleccionados, nav activo, botão */
+      --green:        #354d3f;
       --green-hover:  #2b3f33;
-      --brown:        #5f5145;   /* título hero */
-      --text:         #1e1e1e;   /* texto principal */
-      --text-dark:    #181818;   /* chips inactivos */
-      --border-chip:  #354d3f;   /* borda dos chips de restrição */
-      --separator:    #e9ecf0;   /* borda do contentor de chips */
-
-      /* Sombras */
+      --brown:        #5f5145;
+      --text:         #1e1e1e;
+      --text-dark:    #181818;
+      --border-chip:  #354d3f;
       --shadow-card:  0px 12px 18px 0px rgba(0,0,0,0.08);
-      --shadow-chip:  0px 4px 4px rgba(0,0,0,0.24);       /* chips radio/tempo/pessoas/ingredientes */
-      --shadow-res:   0px 4px 8px 0px rgba(0,0,0,0.24);   /* chips restrições */
-
-      /* Raios */
-      --r-card:   16px;
-      --r-chip:   24px;
-      --r-btn:    12px;   /* botão "Mostrar sugestões" + nav items */
-
-      /* Fontes */
+      --r-card:       16px;
+      --r-chip:       24px;
+      --r-btn:        12px;
       --serif-display: 'Libertinus Serif Display', 'Libertinus Serif', Georgia, serif;
       --serif-body:    'Inria Serif', Georgia, serif;
       --sans:          'Inter', system-ui, sans-serif;
       --mono:          'Courier New', monospace;
-
-      --transition: .15s ease;
+      --transition:    .15s ease;
     }
 
     /* =====================================================
@@ -66,149 +51,54 @@
       min-height: 100vh;
       -webkit-font-smoothing: antialiased;
     }
-    img  { display: block; max-width: 100%; }
+    img    { display: block; max-width: 100%; }
     button { cursor: pointer; font-family: var(--sans); }
-    ul { list-style: none; }
+    ul     { list-style: none; }
 
     /* =====================================================
-       LAYOUT RAIZ — página completa
-       Ficou igual ao Figma: fundo #f4f3ee, conteúdo centrado
+       PAGE — mobile-first single column, right-aligned
        ===================================================== */
     .page {
-      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 24px;
+      padding: 16px 24px 146px;
       min-height: 100vh;
       background: var(--bg);
     }
 
     /* =====================================================
-       ZONA DO HERO (topo) — ilustração + título
-       No Figma: absolute left:45 top:24 (ilustração) e left:520 top:34 (título)
-       Replicamos com flex relativo ao wrapper
+       HEADER — title right, illustration floating left
        ===================================================== */
-    .hero-zone {
+    .header {
       display: flex;
-      align-items: flex-end;
-      gap: 0;
-      padding: 24px 0 0 45px;
-      height: 179px;           /* top do content no Figma é 179px */
+      gap: 17px;
+      align-items: center;
+      justify-content: flex-end;
       position: relative;
+      width: 250px;
+      flex-shrink: 0;
     }
     .hero-img {
-      width: 432px;
-      height: 140px;
-      flex-shrink: 0;
+      position: absolute;
+      left: -167px;
+      top: 1px;
+      width: 162px;
+      height: 89px;
       mix-blend-mode: multiply;
       object-fit: cover;
-      object-position: left center;
     }
     .hero-title {
       font-family: var(--serif-display);
-      font-size: 64px;
+      font-size: 42px;
       font-weight: 400;
-      line-height: 60px;
+      line-height: 46px;
       color: var(--brown);
-      white-space: nowrap;
-      position: absolute;
-      left: 520px;
-      top: 34px;
     }
 
     /* =====================================================
-       CONTENT AREA — sidebar + filtros
-       No Figma: gap:32px, left:249px, top:179px
-       ===================================================== */
-    .content-area {
-      display: flex;
-      gap: 32px;
-      align-items: flex-start;
-      padding: 0 0 60px 249px;
-    }
-
-    /* =====================================================
-       SIDEBAR — card branco com logo + nav
-       No Figma: w:229, p:24, gap:16, shadow-card, r:16
-       ===================================================== */
-    .sidebar {
-      background: var(--white);
-      border-radius: var(--r-card);
-      padding: 24px;
-      box-shadow: var(--shadow-card);
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      flex-shrink: 0;
-      width: 229px;
-    }
-
-    /* Logo — SVG local 181×42px */
-    .logo {
-      flex-shrink: 0;
-    }
-    .logo-img {
-      display: block;
-      width: 181px;
-      height: 42px;
-    }
-
-    /* Nav items — flex col gap:16, full width */
-    .nav-items {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      width: 100%;
-    }
-
-    /* Botão nav individual — h:48 px:16 py:8 r:16 gap:8 */
-    .nav-btn {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      height: 48px;
-      padding: 8px 16px;
-      border-radius: var(--r-btn);
-      border: none;
-      background: transparent;
-      width: 100%;
-      font-family: var(--serif-body);
-      font-size: 16px;
-      font-weight: 400;
-      color: var(--text);
-      transition: var(--transition);
-      cursor: pointer;
-      white-space: nowrap;
-    }
-    .nav-btn:hover { background: rgba(53,77,63,.08); }
-    /* Estado activo — fundo verde, texto branco */
-    .nav-btn.active {
-      background: var(--green);
-      color: var(--white);
-    }
-    .nav-btn .nav-icon {
-      width: 24px;
-      height: 24px;
-      flex-shrink: 0;
-      object-fit: contain;
-      /* Quando activo, o ícone deve ficar branco — usamos filter */
-    }
-    .nav-btn.active .nav-icon { filter: brightness(0) invert(1); }
-
-    /* Badge de favoritos */
-    .fav-badge {
-      margin-left: auto;
-      background: rgba(255,255,255,.3);
-      color: var(--white);
-      font-family: var(--sans);
-      font-size: 11px;
-      font-weight: 700;
-      padding: 1px 7px;
-      border-radius: 20px;
-      display: none;
-    }
-    .nav-btn.active .fav-badge[data-count]:not([data-count=""]) { display: inline; }
-
-    /* =====================================================
-       PAINEL DE FILTROS — card branco
-       No Figma: w:519, p:24, gap:32, shadow-card, r:16
+       FILTERS PANEL — full-width white card
        ===================================================== */
     .filters-panel {
       background: var(--white);
@@ -218,31 +108,27 @@
       display: flex;
       flex-direction: column;
       gap: 32px;
-      flex-shrink: 0;
-      width: 519px;
+      width: 100%;
     }
 
-    /* Contentor interior dos filtros — flex col gap:16 */
+    /* =====================================================
+       FILTERS INNER
+       ===================================================== */
     .filters-inner {
       display: flex;
       flex-direction: column;
       gap: 16px;
     }
-
-    /* Cada bloco de filtro — flex col gap:8 */
     .filter-block {
       display: flex;
       flex-direction: column;
       gap: 8px;
     }
-
-    /* Cabeçalho do filtro — p:8 gap:8 w:219 */
     .filter-header {
       display: flex;
       align-items: center;
       gap: 8px;
       padding: 8px;
-      width: 219px;
     }
     .filter-header-icon {
       width: 24px;
@@ -260,34 +146,30 @@
     }
 
     /* =====================================================
-       CHIPS — tempo, pessoas, ingredientes
-       O slider (.chip-slider) desloca-se por baixo dos botões.
-       h:40 px:16 py:8 min-w:80 r:24
+       CHIPS — slider radio buttons
        ===================================================== */
     .chip-row {
       display: flex;
       align-items: center;
-      gap: 4px;
       border-radius: var(--r-chip);
-      position: relative;     /* contexto de posicionamento do slider */
+      position: relative;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
     }
-
-    /* Pastilha verde que desliza */
     .chip-slider {
       position: absolute;
       top: 0;
       left: 0;
       height: 100%;
-      width: 80px;            /* inicializado por JS */
+      width: 80px;
       background: var(--green);
       border-radius: var(--r-chip);
-      box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.25);
-      transition: left 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-                  width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 2px 8px 0 rgba(0,0,0,0.25);
+      transition: left 0.25s cubic-bezier(0.4,0,0.2,1),
+                  width 0.25s cubic-bezier(0.4,0,0.2,1);
       pointer-events: none;
       z-index: 0;
     }
-
     .chip {
       position: relative;
       z-index: 1;
@@ -303,6 +185,7 @@
       color: var(--text-dark);
       cursor: pointer;
       white-space: nowrap;
+      flex-shrink: 0;
       transition: color var(--transition);
       line-height: normal;
     }
@@ -310,9 +193,7 @@
     .chip.selected { color: var(--white); }
 
     /* =====================================================
-       CHIPS DE RESTRIÇÃO — multi-select
-       Têm borda verde #354d3f e sombra diferente (box-shadow)
-       gap:8 entre si (ao contrário dos outros que não têm gap)
+       RESTRICTION CHIPS — multi-select with border
        ===================================================== */
     .restriction-row {
       display: flex;
@@ -320,7 +201,6 @@
       flex-wrap: wrap;
       gap: 8px;
     }
-
     .chip-restriction {
       height: 40px;
       min-width: 80px;
@@ -338,7 +218,6 @@
       line-height: normal;
     }
     .chip-restriction:hover { background: rgba(53,77,63,.07); }
-    /* Estado seleccionado — fundo verde, texto branco, mantém borda */
     .chip-restriction.checked {
       background: var(--green);
       color: var(--white);
@@ -346,16 +225,14 @@
     }
 
     /* =====================================================
-       BOTÃO "MOSTRAR SUGESTÕES"
-       No Figma: w:471 h:48 bg:#354d3f r:16 gap:8 px:24 py:14
-       Texto: Inria Serif Bold 16px branco
+       SUBMIT BUTTON
        ===================================================== */
     .btn-submit {
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
-      width: 471px;
+      width: 100%;
       height: 48px;
       padding: 14px 24px;
       background: var(--green);
@@ -367,7 +244,6 @@
       color: var(--white);
       cursor: pointer;
       transition: background var(--transition), transform var(--transition);
-      flex-shrink: 0;
     }
     .btn-submit:hover  { background: var(--green-hover); transform: translateY(-1px); }
     .btn-submit:active { transform: translateY(0); }
@@ -379,7 +255,9 @@
       object-fit: contain;
     }
 
-    /* Erro de validação */
+    /* =====================================================
+       ERROR
+       ===================================================== */
     .error-msg {
       display: none;
       padding: 10px 14px;
@@ -420,9 +298,9 @@
     }
 
     /* =====================================================
-       GRELHA DE RECEITAS
+       RECIPES SECTION
        ===================================================== */
-    .recipes-section { display: none; width: 519px; }
+    .recipes-section { display: none; width: 100%; }
     .recipes-section.visible { display: block; }
 
     .section-header {
@@ -451,13 +329,19 @@
     }
     .btn-back:hover { border-color: var(--green); color: var(--green); }
 
+    /* Grid: 1 col on mobile, 2 col above 480px */
     .recipes-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: 1fr;
       gap: 14px;
     }
+    @media (min-width: 480px) {
+      .recipes-grid { grid-template-columns: repeat(2, 1fr); }
+    }
 
-    /* Card de receita */
+    /* =====================================================
+       RECIPE CARD
+       ===================================================== */
     .recipe-card {
       background: var(--white);
       border-radius: var(--r-card);
@@ -495,7 +379,6 @@
       line-height: 1;
     }
     .fav-btn:hover { transform: scale(1.2); }
-
     .card-body { padding: 10px 12px 13px; }
     .card-name {
       font-family: var(--serif-body);
@@ -517,14 +400,13 @@
     }
 
     /* =====================================================
-       FAVORITOS
+       FAVORITES SECTION
        ===================================================== */
-    .favorites-section { display: none; width: 519px; }
+    .favorites-section { display: none; width: 100%; }
     .favorites-section.visible { display: block; }
     .empty-state {
       text-align: center;
       padding: 52px 20px;
-      color: var(--brown);
     }
     .empty-icon { font-size: 40px; margin-bottom: 12px; }
     .empty-state p {
@@ -535,7 +417,7 @@
     }
 
     /* =====================================================
-       MODAL DE DETALHE DA RECEITA
+       RECIPE MODAL
        ===================================================== */
     .modal-overlay {
       display: none;
@@ -582,7 +464,6 @@
       transition: var(--transition);
     }
     .modal-close:hover { background: var(--white); color: var(--text); }
-
     .modal-body { padding: 22px 24px 26px; }
     .modal-title {
       font-family: var(--serif-display);
@@ -591,7 +472,6 @@
       color: var(--brown);
       margin-bottom: 16px;
     }
-
     .stats-row {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -619,7 +499,6 @@
       letter-spacing: .06em;
       margin-top: 3px;
     }
-
     .modal-section { margin-bottom: 18px; }
     .modal-section-title {
       font-family: var(--sans);
@@ -631,7 +510,6 @@
       margin-bottom: 10px;
       display: flex; align-items: center; gap: 5px;
     }
-
     .ingredients-list { display: flex; flex-direction: column; gap: 7px; }
     .ingredient-item {
       display: flex; align-items: center; gap: 9px;
@@ -645,7 +523,6 @@
       background: var(--green);
       flex-shrink: 0;
     }
-
     .steps-list { display: flex; flex-direction: column; gap: 11px; }
     .step-item { display: flex; gap: 12px; align-items: flex-start; }
     .step-num {
@@ -654,8 +531,7 @@
       background: var(--green);
       color: var(--white);
       font-family: var(--sans);
-      font-size: 11px;
-      font-weight: 700;
+      font-size: 11px; font-weight: 700;
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
       margin-top: 2px;
@@ -666,15 +542,12 @@
       line-height: 1.6;
       color: var(--text);
     }
-
     .modal-actions {
       display: flex; flex-direction: column; gap: 9px;
       margin-top: 22px;
       padding-top: 18px;
       border-top: 1px solid #ebebeb;
     }
-
-    /* Botão primário dentro do modal — mesma linguagem do botão submit */
     .btn-modal-primary {
       display: flex; align-items: center; justify-content: center; gap: 8px;
       width: 100%; padding: 13px 20px;
@@ -687,7 +560,6 @@
       transition: background var(--transition);
     }
     .btn-modal-primary:hover { background: var(--green-hover); }
-
     .btn-modal-secondary {
       display: flex; align-items: center; justify-content: center; gap: 8px;
       width: 100%; padding: 12px 20px;
@@ -707,7 +579,7 @@
     }
 
     /* =====================================================
-       MODAL LISTA DE COMPRAS
+       SHOPPING MODAL
        ===================================================== */
     .shopping-modal {
       background: var(--white);
@@ -749,11 +621,81 @@
     .shopping-actions button { flex: 1; }
 
     /* =====================================================
-       TOAST
+       BOTTOM NAV — fixed pill
+       ===================================================== */
+    .nav-mobile {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 48px);
+      max-width: 392px;
+      height: 70px;
+      background: var(--white);
+      border-radius: 40px;
+      box-shadow: var(--shadow-card);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 11px 13px;
+      z-index: 200;
+    }
+    .nav-mobile-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      height: 48px;
+      flex: 1;
+      min-width: 0;
+      padding: 8px 16px;
+      border: none;
+      background: transparent;
+      font-family: var(--serif-body);
+      font-size: 16px;
+      cursor: pointer;
+      color: var(--text);
+      border-radius: 36px;
+      white-space: nowrap;
+      transition: background var(--transition), color var(--transition);
+    }
+    .nav-mobile-item.active {
+      background: var(--green);
+      color: var(--white);
+      border-radius: 28px;
+    }
+    .nav-mobile-item .nav-icon {
+      width: 24px;
+      height: 24px;
+      flex-shrink: 0;
+      object-fit: contain;
+    }
+    .nav-mobile-item.active .nav-icon { filter: brightness(0) invert(1); }
+    .nav-center-icon {
+      height: 48px;
+      width: auto;
+      flex-shrink: 0;
+      object-fit: contain;
+    }
+    .fav-badge {
+      margin-left: auto;
+      background: var(--green);
+      color: var(--white);
+      font-family: var(--sans);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 1px 7px;
+      border-radius: 20px;
+      display: none;
+    }
+    #navFav .fav-badge[data-count]:not([data-count=""]) { display: inline; }
+    #navFav.active .fav-badge { background: rgba(255,255,255,.3); }
+
+    /* =====================================================
+       TOAST — above the nav bar
        ===================================================== */
     .toast {
       position: fixed;
-      bottom: 22px; right: 22px;
+      bottom: 110px; right: 22px;
       background: var(--text);
       color: var(--white);
       padding: 11px 18px;
@@ -770,23 +712,13 @@
     .toast.show { opacity: 1; transform: translateY(0); }
 
     /* =====================================================
-       RESPONSIVO — abaixo de 900px empilha
+       DESKTOP — center the content column
        ===================================================== */
-    @media (max-width: 900px) {
-      .hero-zone { padding-left: 20px; height: auto; margin-bottom: 20px; }
-      .hero-title { position: static; font-size: 40px; line-height: 1.15; }
-      .hero-img   { width: 200px; height: 80px; }
-      .content-area { padding: 0 16px 60px; flex-direction: column; }
-      .sidebar { width: 100%; flex-direction: row; flex-wrap: wrap; align-items: center; }
-      .nav-items { flex-direction: row; width: auto; }
-      .nav-btn { width: auto; }
-      .filters-panel { width: 100%; }
-      .btn-submit { width: 100%; }
-      .recipes-section, .favorites-section { width: 100%; }
-      .recipes-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-    @media (max-width: 540px) {
-      .recipes-grid { grid-template-columns: 1fr; }
+    @media (min-width: 600px) {
+      .page {
+        max-width: 480px;
+        margin: 0 auto;
+      }
     }
   </style>
 </head>
@@ -794,188 +726,173 @@
 
 <div class="page">
 
-  <!-- =====================================================
-       HERO — ilustração (asset Figma) + título serif
-       ===================================================== -->
-  <div class="hero-zone">
-    <!-- Imagem real do Figma (via MCP asset URL) -->
+  <!-- HEADER -->
+  <div class="header">
     <img
       class="hero-img"
-      src="https://www.figma.com/api/mcp/asset/b620195c-7649-4bad-bb46-d0b8e63ec0f7"
+      src="https://www.figma.com/api/mcp/asset/df49a763-2e1d-44fc-a181-5614e5ee5086"
       alt="Ilustração de um prato com legumes"
     />
     <h1 class="hero-title">O que vou<br>cozinhar hoje?</h1>
   </div>
 
-  <!-- =====================================================
-       CONTENT — sidebar + painel de filtros
-       ===================================================== -->
-  <div class="content-area">
+  <!-- FILTERS PANEL -->
+  <div class="filters-panel" id="filtersPanel">
 
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-      <!-- Logo -->
-      <div class="logo">
-        <img class="logo-img" src="logo.svg" alt="MealPick" />
-      </div>
+    <!-- Loading -->
+    <div class="loading-state" id="loadingState">
+      <div class="spinner"></div>
+      <p>A pensar em receitas para ti…</p>
+    </div>
 
-      <!-- Nav -->
-      <div class="nav-items">
-        <!-- Home — activo por defeito -->
-        <button class="nav-btn active" id="navHome" onclick="navSwitch('home')">
-          <img
-            class="nav-icon"
-            src="https://www.figma.com/api/mcp/asset/5c9eb4fc-ff12-4ad2-b76e-f7390d287bbc"
-            alt=""
-          />
-          Home
-        </button>
-        <!-- Favoritos -->
-        <button class="nav-btn" id="navFav" onclick="navSwitch('favoritos')">
-          <img
-            class="nav-icon"
-            src="https://www.figma.com/api/mcp/asset/352f8d5e-5c20-46e0-a227-53bc8b0826b9"
-            alt=""
-          />
-          Favoritos
-          <span class="fav-badge" id="favBadge" data-count=""></span>
-        </button>
-      </div>
-    </aside>
+    <!-- Form -->
+    <div id="formCard">
+      <div class="filters-inner">
 
-    <!-- PAINEL DE FILTROS -->
-    <div class="filters-panel" id="filtersPanel">
-
-      <!-- Loading -->
-      <div class="loading-state" id="loadingState">
-        <div class="spinner"></div>
-        <p>A pensar em receitas para ti…</p>
-      </div>
-
-      <!-- Formulário (esconde durante loading / após gerar) -->
-      <div id="formCard">
-        <div class="filters-inner">
-
-          <!-- 1. Tempo para cozinhar -->
-          <div class="filter-block">
-            <div class="filter-header">
-              <img
-                class="filter-header-icon"
-                src="https://www.figma.com/api/mcp/asset/d1be11cf-989a-42c4-973f-6e593329b5de"
-                alt=""
-              />
-              <span class="filter-header-label">Tempo para cozinhar</span>
-            </div>
-            <!-- Chips sem gap — encostados, só o seleccionado tem fundo verde -->
-            <div class="chip-row" id="tempoGroup">
-              <div class="chip-slider"></div>
-              <button class="chip selected" data-value="15" onclick="selectChip('tempo', this)">15 min</button>
-              <button class="chip" data-value="30" onclick="selectChip('tempo', this)">30 min</button>
-              <button class="chip" data-value="45" onclick="selectChip('tempo', this)">45 min</button>
-              <button class="chip" data-value="60" onclick="selectChip('tempo', this)">+60 min</button>
-            </div>
+        <!-- 1. Tempo -->
+        <div class="filter-block">
+          <div class="filter-header">
+            <img
+              class="filter-header-icon"
+              src="https://www.figma.com/api/mcp/asset/d824ee17-ae8e-44cd-bd5d-aa85274edf5f"
+              alt=""
+            />
+            <span class="filter-header-label">Tempo para cozinhar</span>
           </div>
-
-          <!-- 2. N. de pessoas -->
-          <div class="filter-block">
-            <div class="filter-header">
-              <img
-                class="filter-header-icon"
-                src="https://www.figma.com/api/mcp/asset/962b4f67-0a26-436e-bdff-6bba86e7c2ef"
-                alt=""
-              />
-              <span class="filter-header-label">Nº de pessoas</span>
-            </div>
-            <div class="chip-row" id="pessoasGroup">
-              <div class="chip-slider"></div>
-              <button class="chip selected" data-value="1" onclick="selectChip('pessoas', this)">1</button>
-              <button class="chip" data-value="2" onclick="selectChip('pessoas', this)">2</button>
-              <button class="chip" data-value="3" onclick="selectChip('pessoas', this)">3</button>
-              <button class="chip" data-value="4" onclick="selectChip('pessoas', this)">+4</button>
-            </div>
-          </div>
-
-          <!-- 3. N. de ingredientes -->
-          <div class="filter-block">
-            <div class="filter-header">
-              <img
-                class="filter-header-icon"
-                src="https://www.figma.com/api/mcp/asset/be70b5f5-6060-4738-8d9d-ecccbabc2772"
-                alt=""
-              />
-              <span class="filter-header-label">Nº de ingredientes</span>
-            </div>
-            <div class="chip-row" id="ingredientesGroup">
-              <div class="chip-slider"></div>
-              <button class="chip selected" data-value="4"  onclick="selectChip('ingredientes', this)">4</button>
-              <button class="chip" data-value="6"  onclick="selectChip('ingredientes', this)">6</button>
-              <button class="chip" data-value="8"  onclick="selectChip('ingredientes', this)">8</button>
-              <button class="chip" data-value="10" onclick="selectChip('ingredientes', this)">+10</button>
-            </div>
-          </div>
-
-          <!-- 4. Restrições alimentares — chips com borda, multi-select -->
-          <div class="filter-block">
-            <div class="filter-header">
-              <img
-                class="filter-header-icon"
-                src="https://www.figma.com/api/mcp/asset/12eaa5d8-e9ad-4167-bb73-4c62a2f689e1"
-                alt=""
-              />
-              <span class="filter-header-label">Restrições alimentares</span>
-            </div>
-            <div class="restriction-row" id="restricoesGroup">
-              <button class="chip-restriction" data-value="sem lactose"  onclick="toggleCheck(this)">Sem lactose</button>
-              <button class="chip-restriction" data-value="vegano"       onclick="toggleCheck(this)">Vegano</button>
-              <button class="chip-restriction" data-value="vegetariano"  onclick="toggleCheck(this)">Vegetariano</button>
-              <button class="chip-restriction" data-value="sem glúten"   onclick="toggleCheck(this)">Sem gluten</button>
-            </div>
-          </div>
-
-        </div><!-- /filters-inner -->
-
-        <!-- Erro de validação -->
-        <div class="error-msg" id="errorMsg" style="margin-top:12px;">
-          ⚠ Selecciona pelo menos o tempo e o número de pessoas.
-        </div>
-
-        <!-- Botão submit -->
-        <button class="btn-submit" style="margin-top:32px;" id="generateBtn" onclick="generateRecipes()">
-          <img
-            class="btn-submit-icon"
-            src="https://www.figma.com/api/mcp/asset/5747d1f8-7b48-4fdf-b844-26a20514ac69"
-            alt=""
-          />
-          Mostrar sugestões
-        </button>
-      </div><!-- /formCard -->
-
-      <!-- RECEITAS (injectadas aqui) -->
-      <div class="recipes-section" id="recipesSection">
-        <div class="section-header">
-          <span class="section-title">3 sugestões para ti</span>
-          <button class="btn-back" onclick="resetForm()">← Mudar filtros</button>
-        </div>
-        <div class="recipes-grid" id="recipesGrid"></div>
-      </div>
-
-      <!-- FAVORITOS (injectados aqui) -->
-      <div class="favorites-section" id="favoritesSection">
-        <div class="section-header">
-          <span class="section-title">Os meus favoritos</span>
-        </div>
-        <div class="recipes-grid" id="favoritesGrid"></div>
-        <div id="favEmptyState" style="display:none;">
-          <div class="empty-state">
-            <div class="empty-icon">♡</div>
-            <p>Ainda não tens receitas guardadas.<br>Guarda uma sugestão para aparecer aqui.</p>
+          <div class="chip-row" id="tempoGroup">
+            <div class="chip-slider"></div>
+            <button class="chip selected" data-value="15" onclick="selectChip('tempo', this)">15 min</button>
+            <button class="chip" data-value="30" onclick="selectChip('tempo', this)">30 min</button>
+            <button class="chip" data-value="45" onclick="selectChip('tempo', this)">45 min</button>
+            <button class="chip" data-value="60" onclick="selectChip('tempo', this)">+60 min</button>
           </div>
         </div>
+
+        <!-- 2. Pessoas -->
+        <div class="filter-block">
+          <div class="filter-header">
+            <img
+              class="filter-header-icon"
+              src="https://www.figma.com/api/mcp/asset/625130d9-abba-4954-a918-290ba97dcf0c"
+              alt=""
+            />
+            <span class="filter-header-label">Nº de pessoas</span>
+          </div>
+          <div class="chip-row" id="pessoasGroup">
+            <div class="chip-slider"></div>
+            <button class="chip selected" data-value="1" onclick="selectChip('pessoas', this)">1</button>
+            <button class="chip" data-value="2" onclick="selectChip('pessoas', this)">2</button>
+            <button class="chip" data-value="3" onclick="selectChip('pessoas', this)">3</button>
+            <button class="chip" data-value="4" onclick="selectChip('pessoas', this)">+4</button>
+          </div>
+        </div>
+
+        <!-- 3. Ingredientes -->
+        <div class="filter-block">
+          <div class="filter-header">
+            <img
+              class="filter-header-icon"
+              src="https://www.figma.com/api/mcp/asset/183e931f-8267-4d29-83c7-a30b3b933119"
+              alt=""
+            />
+            <span class="filter-header-label">Nº de ingredientes</span>
+          </div>
+          <div class="chip-row" id="ingredientesGroup">
+            <div class="chip-slider"></div>
+            <button class="chip selected" data-value="4"  onclick="selectChip('ingredientes', this)">4</button>
+            <button class="chip" data-value="6"  onclick="selectChip('ingredientes', this)">6</button>
+            <button class="chip" data-value="8"  onclick="selectChip('ingredientes', this)">8</button>
+            <button class="chip" data-value="10" onclick="selectChip('ingredientes', this)">+10</button>
+          </div>
+        </div>
+
+        <!-- 4. Restrições -->
+        <div class="filter-block">
+          <div class="filter-header">
+            <img
+              class="filter-header-icon"
+              src="https://www.figma.com/api/mcp/asset/42e75bf3-e527-4347-9ba8-820d13dc3d8b"
+              alt=""
+            />
+            <span class="filter-header-label">Restrições alimentares</span>
+          </div>
+          <div class="restriction-row" id="restricoesGroup">
+            <button class="chip-restriction" data-value="sem lactose"  onclick="toggleCheck(this)">Sem lactose</button>
+            <button class="chip-restriction" data-value="vegano"       onclick="toggleCheck(this)">Vegano</button>
+            <button class="chip-restriction" data-value="vegetariano"  onclick="toggleCheck(this)">Vegetariano</button>
+            <button class="chip-restriction" data-value="sem glúten"   onclick="toggleCheck(this)">Sem gluten</button>
+          </div>
+        </div>
+
+      </div><!-- /filters-inner -->
+
+      <!-- Error -->
+      <div class="error-msg" id="errorMsg" style="margin-top:12px;">
+        ⚠ Selecciona pelo menos o tempo e o número de pessoas.
       </div>
 
-    </div><!-- /filters-panel -->
-  </div><!-- /content-area -->
+      <!-- Submit -->
+      <button class="btn-submit" style="margin-top:32px;" id="generateBtn" onclick="generateRecipes()">
+        <img
+          class="btn-submit-icon"
+          src="https://www.figma.com/api/mcp/asset/4cb37cbc-295b-4a24-9431-b117f1a707ad"
+          alt=""
+        />
+        Mostrar sugestões
+      </button>
+    </div><!-- /formCard -->
+
+    <!-- Recipes -->
+    <div class="recipes-section" id="recipesSection">
+      <div class="section-header">
+        <span class="section-title">3 sugestões para ti</span>
+        <button class="btn-back" onclick="resetForm()">← Mudar filtros</button>
+      </div>
+      <div class="recipes-grid" id="recipesGrid"></div>
+    </div>
+
+    <!-- Favorites -->
+    <div class="favorites-section" id="favoritesSection">
+      <div class="section-header">
+        <span class="section-title">Os meus favoritos</span>
+      </div>
+      <div class="recipes-grid" id="favoritesGrid"></div>
+      <div id="favEmptyState" style="display:none;">
+        <div class="empty-state">
+          <div class="empty-icon">♡</div>
+          <p>Ainda não tens receitas guardadas.<br>Guarda uma sugestão para aparecer aqui.</p>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /filters-panel -->
 </div><!-- /page -->
+
+<!-- BOTTOM NAV -->
+<nav class="nav-mobile">
+  <button class="nav-mobile-item active" id="navHome" onclick="navSwitch('home')">
+    <img
+      class="nav-icon"
+      src="https://www.figma.com/api/mcp/asset/7f1744e3-b58e-4e7c-ad45-e484646f24ec"
+      alt=""
+    />
+    Home
+  </button>
+  <img
+    class="nav-center-icon"
+    src="https://www.figma.com/api/mcp/asset/091de83e-e26e-4027-8b61-f390e12305f6"
+    alt=""
+  />
+  <button class="nav-mobile-item" id="navFav" onclick="navSwitch('favoritos')">
+    <img
+      class="nav-icon"
+      src="https://www.figma.com/api/mcp/asset/294e8843-8ca0-450d-b536-3e504a1c67ae"
+      alt=""
+    />
+    Favoritos
+    <span class="fav-badge" id="favBadge" data-count=""></span>
+  </button>
+</nav>
 
 <!-- =====================================================
      MODAL DE DETALHE DA RECEITA
@@ -1049,10 +966,6 @@
      ===================================================== -->
 <script>
 // =========================================================
-// CONFIGURAÇÃO
-// =========================================================
-
-// =========================================================
 // ESTADO GLOBAL
 // =========================================================
 const state = {
@@ -1083,7 +996,7 @@ updateFavBadge();
 initSliders();
 
 // =========================================================
-// NAVEGAÇÃO SIDEBAR
+// NAVEGAÇÃO
 // =========================================================
 function navSwitch(view) {
   state.currentView = view;
@@ -1121,7 +1034,6 @@ function initSliders() {
     if (!slider) return;
     slider.style.transition = 'none';
     moveSlider(row);
-    // Re-enable transition após o posicionamento inicial
     requestAnimationFrame(() => requestAnimationFrame(() => {
       slider.style.transition = '';
     }));
@@ -1129,10 +1041,10 @@ function initSliders() {
 }
 
 // =========================================================
-// CHIPS — selecção única por grupo (sempre um seleccionado)
+// CHIPS — selecção única
 // =========================================================
 function selectChip(group, btn) {
-  if (btn.classList.contains('selected')) return; // já seleccionado, não faz nada
+  if (btn.classList.contains('selected')) return;
   const row = btn.parentElement;
   row.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
   btn.classList.add('selected');
@@ -1157,12 +1069,12 @@ function toggleCheck(btn) {
 // =========================================================
 // VALIDAÇÃO
 // =========================================================
-function validate()  { return state.tempo !== null && state.pessoas !== null; }  // sempre true com defaults
+function validate()  { return state.tempo !== null && state.pessoas !== null; }
 function showError() { document.getElementById('errorMsg').classList.add('visible'); }
 function hideError() { document.getElementById('errorMsg').classList.remove('visible'); }
 
 // =========================================================
-// GERAR RECEITAS — Gemini API
+// GERAR RECEITAS
 // =========================================================
 async function generateRecipes() {
   if (!validate()) { showError(); return; }
@@ -1214,7 +1126,7 @@ function getFallback() {
 }
 
 // =========================================================
-// RENDERIZAR CARDS DE RECEITAS
+// RENDERIZAR RECEITAS
 // =========================================================
 function renderRecipes() {
   const grid = document.getElementById('recipesGrid');
@@ -1381,9 +1293,8 @@ function exportShoppingList() {
 // RESET
 // =========================================================
 function resetForm() {
-  // Restaura cada grupo ao primeiro chip, sem animação
   document.querySelectorAll('.chip-row').forEach(row => {
-    const chips  = row.querySelectorAll('.chip');
+    const chips = row.querySelectorAll('.chip');
     chips.forEach(c => c.classList.remove('selected'));
     if (chips.length) chips[0].classList.add('selected');
     const slider = row.querySelector('.chip-slider');
