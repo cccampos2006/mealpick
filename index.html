@@ -1096,7 +1096,7 @@ async function generateRecipes() {
   document.getElementById('loadingState').classList.add('visible');
 
   try {
-    const res = await fetch('/.netlify/functions/generate-recipes', {
+    const res = await fetch('/api/generate-recipes', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
