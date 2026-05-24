@@ -21,14 +21,14 @@ Cada receita deve ter exactamente esta estrutura:
   "nome": "Nome da receita",
   "emoji": "1 emoji representativo",
   "tempo": "X min",
-  "custo": "€X.XX",
+  "nivelCusto": 1,
   "calorias": "XXX kcal",
   "ingredientes": ["ingrediente 1 com quantidade", "ingrediente 2 com quantidade"],
   "passos": ["Passo 1 detalhado", "Passo 2 detalhado"],
   "tags": ["tag1", "tag2"]
 }
 
-Regras: NÃO incluas sal, pimenta, azeite ou água nos ingredientes. Receitas realistas e portuguesas.`;
+Regras: NÃO incluas sal, pimenta, azeite ou água nos ingredientes. Receitas realistas e portuguesas. nivelCusto deve ser 1 (barato), 2 (médio) ou 3 (caro).`;
 
   try {
     const res = await fetch(

@@ -274,6 +274,7 @@
       flex-shrink: 0;
       display: block;
       object-fit: contain;
+      filter: brightness(0) invert(1);
     }
 
     /* =====================================================
@@ -331,24 +332,11 @@
       margin-bottom: 16px;
     }
     .section-title {
-      font-family: var(--serif-body);
-      font-size: 18px;
-      font-weight: 700;
+      font-family: var(--serif-display);
+      font-size: 23px;
+      font-weight: 400;
       color: var(--text);
     }
-    .btn-back {
-      padding: 7px 16px;
-      border: 1.5px solid rgba(53,77,63,.3);
-      border-radius: var(--r-chip);
-      background: transparent;
-      font-family: var(--sans);
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--brown);
-      cursor: pointer;
-      transition: var(--transition);
-    }
-    .btn-back:hover { border-color: var(--green); color: var(--green); }
 
     /* Grid: 1 col on mobile, 2 col above 480px */
     .recipes-grid {
@@ -746,6 +734,90 @@
         margin: 0 auto;
       }
     }
+
+    /* =====================================================
+       CAROUSEL — recipe suggestions
+       ===================================================== */
+    .filters-panel.panel-transparent {
+      background: transparent; box-shadow: none; padding: 0;
+      border-radius: 0; overflow: visible;
+    }
+    .filter-container.carousel-mode { padding: 0; }
+
+    .recipes-section .section-header { padding: 0 24px; margin-bottom: 0; }
+
+    .btn-mudar-filtros {
+      display: flex; align-items: center; gap: 8px;
+      background: transparent; border: none;
+      font-family: var(--serif-body); font-size: 15px;
+      color: var(--green); cursor: pointer;
+    }
+
+    .carousel-wrapper { width: 100%; overflow-x: clip; overflow-y: visible; padding: 20px 0 8px; }
+    .carousel-track {
+      display: flex; align-items: center; gap: 16px;
+      padding: 0 72px;
+      transition: transform .35s cubic-bezier(.4,0,.2,1);
+      will-change: transform;
+    }
+    .carousel-card {
+      flex-shrink: 0; width: calc(100vw - 144px);
+      background: var(--white); border-radius: var(--r-card);
+      padding: 16px;
+      display: flex; flex-direction: column; gap: 8px;
+      cursor: pointer; box-sizing: border-box;
+      transform: scale(.87); opacity: .65;
+      box-shadow: 0px 12px 18px 0px rgba(0,0,0,0.1);
+      transition: transform .35s ease, opacity .35s ease, box-shadow .35s ease;
+      position: relative;
+    }
+    .carousel-card.active {
+      transform: scale(1); opacity: 1;
+      box-shadow: 0px 20px 28px 0px rgba(0,0,0,0.1);
+    }
+    @media (min-width: 600px) {
+      .carousel-card { width: 400px; }
+    }
+    .carousel-image {
+      flex: 1; min-height: 220px;
+      border-radius: 8px; overflow: hidden;
+      position: relative; background: var(--bg);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .carousel-image > img {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+    }
+    .carousel-emoji { font-size: 90px; line-height: 1; }
+    .carousel-card-name {
+      font-family: var(--serif-body); font-size: 20px;
+      color: var(--text); text-align: left;
+    }
+    .carousel-card-info {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 0;
+    }
+    .carousel-info-item {
+      display: flex; align-items: center; gap: 8px;
+      font-family: var(--serif-body); font-size: 16px;
+      color: var(--text); padding: 8px 0px 8px 0px;
+    }
+    .carousel-info-item img { width: 24px; height: 24px; opacity: 1; }
+    .cost-icons { display: flex; align-items: center; }
+    .cost-icon { width: 24px; height: 24px; margin-right: -8px; }
+    .cost-icon:last-child { margin-right: 0; }
+    .cost-faded { opacity: 0.5; }
+
+    .carousel-dots {
+      display: flex; justify-content: center; gap: 8px;
+      padding: 4px 0 16px;
+    }
+    .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      border: none; background: rgba(53,77,63,.2);
+      cursor: pointer; padding: 0; transition: all .25s ease;
+    }
+    .dot.active { background: var(--green); width: 24px; border-radius: 4px; }
   </style>
 </head>
 <body>
@@ -856,10 +928,13 @@
       <!-- Recipes -->
       <div class="recipes-section" id="recipesSection">
         <div class="section-header">
-          <span class="section-title">3 sugestões para ti</span>
-          <button class="btn-back" onclick="resetForm()">← Mudar filtros</button>
+          <span class="section-title">3 sugestões para ti!</span>
+          <button class="btn-mudar-filtros" onclick="mudarFiltros()"><img src="icons/ic-change.svg" alt="" width="24" height="24"> Mudar filtros</button>
         </div>
-        <div class="recipes-grid" id="recipesGrid"></div>
+        <div class="carousel-wrapper" id="carouselWrapper">
+          <div class="carousel-track" id="carouselTrack"></div>
+        </div>
+        <div class="carousel-dots" id="carouselDots"></div>
       </div>
 
       <!-- Favorites -->
@@ -984,6 +1059,7 @@ const state = {
   activeRecipe: null,
   favorites: [],
   currentView: 'home',
+  carouselIndex: 0,
 };
 
 // =========================================================
@@ -1011,15 +1087,28 @@ function navSwitch(view) {
   document.getElementById('navFav').classList.toggle('active',  view === 'favoritos');
 
   const hasResults = state.recipes.length > 0;
+  const panel = document.getElementById('filtersPanel');
+  const fc    = document.querySelector('.filter-container');
 
   if (view === 'home') {
-    document.getElementById('formCard').style.display         = hasResults ? 'none' : '';
-    document.getElementById('recipesSection').classList.toggle('visible', hasResults);
     document.getElementById('favoritesSection').classList.remove('visible');
+    if (hasResults) {
+      document.getElementById('formCard').style.display = 'none';
+      document.getElementById('recipesSection').classList.add('visible');
+      panel.classList.add('panel-transparent');
+      fc.classList.add('carousel-mode');
+    } else {
+      document.getElementById('formCard').style.display = '';
+      document.getElementById('recipesSection').classList.remove('visible');
+      panel.classList.remove('panel-transparent');
+      fc.classList.remove('carousel-mode');
+    }
   } else {
     document.getElementById('formCard').style.display = 'none';
     document.getElementById('recipesSection').classList.remove('visible');
     document.getElementById('favoritesSection').classList.add('visible');
+    panel.classList.remove('panel-transparent');
+    fc.classList.remove('carousel-mode');
     renderFavorites();
   }
 }
@@ -1117,15 +1206,15 @@ async function generateRecipes() {
 // =========================================================
 function getFallback() {
   return [
-    { nome:"Ovos Mexidos com Torrada", emoji:"🍳", tempo:"10 min", custo:"€0.80", calorias:"320 kcal",
+    { nome:"Ovos Mexidos com Torrada", emoji:"🍳", imagem:"https://www.figma.com/api/mcp/asset/0512f129-c4a1-4cd4-8adb-14150f8c4bca", tempo:"10 min", nivelCusto:1, calorias:"320 kcal",
       ingredientes:["3 ovos", "2 fatias de pão de forma", "1 col. sopa de manteiga"],
       passos:["Parte os ovos para uma taça.", "Derrete a manteiga em frigideira a lume médio.", "Mexe os ovos lentamente até cremosos.", "Serve com o pão tostado."],
       tags:["rápido","económico"] },
-    { nome:"Massa com Atum e Tomate", emoji:"🍝", tempo:"20 min", custo:"€1.50", calorias:"480 kcal",
+    { nome:"Massa com Atum e Tomate", emoji:"🍝", imagem:"https://www.figma.com/api/mcp/asset/0512f129-c4a1-4cd4-8adb-14150f8c4bca", tempo:"20 min", nivelCusto:2, calorias:"480 kcal",
       ingredientes:["200g esparguete", "1 lata de atum", "1 lata de tomate pelado", "2 dentes de alho"],
       passos:["Coze a massa conforme instruções.", "Refoga o alho picado 1 min.", "Adiciona o tomate e reduz 5 min.", "Junta o atum e mistura com a massa escorrida."],
       tags:["fácil","económico"] },
-    { nome:"Salada de Grão com Legumes", emoji:"🥗", tempo:"10 min", custo:"€1.20", calorias:"380 kcal",
+    { nome:"Salada de Grão com Legumes", emoji:"🥗", imagem:"https://www.figma.com/api/mcp/asset/0512f129-c4a1-4cd4-8adb-14150f8c4bca", tempo:"10 min", nivelCusto:1, calorias:"380 kcal",
       ingredientes:["1 lata de grão cozido", "1 tomate maduro", "½ pepino", "sumo de ½ limão"],
       passos:["Escorre e lava bem o grão.", "Corta o tomate e pepino em cubos.", "Mistura tudo e tempera com limão e oregãos."],
       tags:["vegetariano","sem glúten"] }
@@ -1133,33 +1222,58 @@ function getFallback() {
 }
 
 // =========================================================
-// RENDERIZAR RECEITAS
+// RENDERIZAR RECEITAS — CAROUSEL
 // =========================================================
+function renderCostIcons(nivel) {
+  return '<div class="cost-icons">' +
+    [1,2,3].map(i =>
+      `<img src="icons/ic-cost.svg" alt="" class="cost-icon${i <= nivel ? '' : ' cost-faded'}">`
+    ).join('') +
+  '</div>';
+}
+
 function renderRecipes() {
-  const grid = document.getElementById('recipesGrid');
-  grid.innerHTML = '';
+  state.carouselIndex = 0;
+  const track = document.getElementById('carouselTrack');
+  const dots  = document.getElementById('carouselDots');
+  track.innerHTML = '';
+  dots.innerHTML  = '';
+
   state.recipes.forEach((r, i) => {
     const fav  = isFavorite(r.nome);
     const card = document.createElement('div');
-    card.className = 'recipe-card';
+    card.className = 'carousel-card' + (i === 0 ? ' active' : '');
+    card.dataset.index = i;
     card.innerHTML = `
-      <div class="card-thumb">
-        <span>${r.emoji}</span>
-        <button class="fav-btn" onclick="event.stopPropagation(); quickToggleFav(${i},this)">${fav?'❤':'🤍'}</button>
+      <div class="carousel-image">
+        ${r.imagem ? `<img src="${r.imagem}" alt="${r.nome}">` : `<span class="carousel-emoji">${r.emoji}</span>`}
       </div>
-      <div class="card-body">
-        <div class="card-name">${r.nome}</div>
-        <div class="card-meta">
-          <span class="meta-tag">⏱ ${r.tempo}</span>
-          <span class="meta-tag">💶 ${r.custo}</span>
-          <span class="meta-tag">🔥 ${r.calorias}</span>
-        </div>
+      <div class="carousel-card-name">${r.nome}</div>
+      <div class="carousel-card-info">
+        <div class="carousel-info-item"><img src="icons/ic-time.svg" alt="tempo"> ${r.tempo}</div>
+        <div class="carousel-info-item"><img src="icons/ic-ingredients.svg" alt="ingredientes"> ${r.ingredientes.length} ingr.</div>
+        <div class="carousel-info-item"><img src="icons/ic-calories.svg" alt="calorias"> ${r.calorias}</div>
+        <div class="carousel-info-item">${renderCostIcons(r.nivelCusto || 1)}</div>
       </div>`;
-    card.onclick = () => openModal(r);
-    grid.appendChild(card);
+    card.onclick = () => {
+      const idx = parseInt(card.dataset.index);
+      if (idx !== state.carouselIndex) setCarouselIndex(idx);
+      else openModal(r);
+    };
+    track.appendChild(card);
+
+    const dot = document.createElement('button');
+    dot.className = 'dot' + (i === 0 ? ' active' : '');
+    dot.setAttribute('aria-label', `Receita ${i + 1}`);
+    dot.onclick = () => setCarouselIndex(i);
+    dots.appendChild(dot);
   });
+
+  document.getElementById('filtersPanel').classList.add('panel-transparent');
+  document.querySelector('.filter-container').classList.add('carousel-mode');
   document.getElementById('recipesSection').classList.add('visible');
   document.getElementById('formCard').style.display = 'none';
+  updateCarouselTransform();
 }
 
 // =========================================================
@@ -1217,7 +1331,16 @@ function toggleFavoriteFromModal() {
     showToast('❤ Guardado!');
   }
   saveFavorites(); updateFavBadge(); updateModalFavBtn();
-  if (state.recipes.length > 0) renderRecipes();
+  if (state.recipes.length > 0) {
+    const idx = state.recipes.findIndex(rec => rec.nome === r.nome);
+    if (idx >= 0) {
+      const card = document.querySelectorAll('.carousel-card')[idx];
+      if (card) {
+        const btn = card.querySelector('.fav-btn');
+        if (btn) btn.textContent = isFavorite(r.nome) ? '❤' : '🤍';
+      }
+    }
+  }
 }
 
 function updateModalFavBtn() {
@@ -1314,11 +1437,59 @@ function resetForm() {
   document.querySelectorAll('.chip-restriction').forEach(c => c.classList.remove('checked'));
   state.tempo = '15'; state.pessoas = '1';
   state.restricoes = []; state.ingredientes = '4'; state.recipes = [];
+  state.carouselIndex = 0;
+  document.getElementById('filtersPanel').classList.remove('panel-transparent');
+  document.querySelector('.filter-container').classList.remove('carousel-mode');
   document.getElementById('formCard').style.display = '';
   document.getElementById('recipesSection').classList.remove('visible');
   hideError();
   navSwitch('home');
 }
+
+// =========================================================
+// CAROUSEL — navegação e swipe
+// =========================================================
+function setCarouselIndex(n) {
+  state.carouselIndex = n;
+  document.querySelectorAll('.carousel-card').forEach((c, i) => c.classList.toggle('active', i === n));
+  document.querySelectorAll('.dot').forEach((d, i)           => d.classList.toggle('active', i === n));
+  updateCarouselTransform();
+}
+
+function updateCarouselTransform() {
+  const wrapper = document.getElementById('carouselWrapper');
+  if (!wrapper) return;
+  const cardW  = wrapper.clientWidth - 144;
+  const gap    = 16;
+  const offset = -state.carouselIndex * (cardW + gap);
+  document.getElementById('carouselTrack').style.transform = `translateX(${offset}px)`;
+}
+window.addEventListener('resize', updateCarouselTransform);
+
+function mudarFiltros() {
+  document.getElementById('filtersPanel').classList.remove('panel-transparent');
+  document.querySelector('.filter-container').classList.remove('carousel-mode');
+  document.getElementById('formCard').style.display = '';
+  document.getElementById('recipesSection').classList.remove('visible');
+  hideError();
+}
+
+function initCarouselSwipe() {
+  let startX = 0;
+  const section = document.getElementById('recipesSection');
+  section.addEventListener('touchstart', e => {
+    startX = e.touches[0].clientX;
+  }, { passive: true });
+  section.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - startX;
+    if (Math.abs(dx) < 40) return;
+    const n = dx < 0
+      ? Math.min(state.carouselIndex + 1, state.recipes.length - 1)
+      : Math.max(state.carouselIndex - 1, 0);
+    if (n !== state.carouselIndex) setCarouselIndex(n);
+  }, { passive: true });
+}
+initCarouselSwipe();
 
 // =========================================================
 // TOAST
