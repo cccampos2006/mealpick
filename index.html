@@ -333,7 +333,7 @@
     }
     .section-title {
       font-family: var(--serif-display);
-      font-size: 23px;
+      font-size: 20px;
       font-weight: 400;
       color: var(--text);
     }
@@ -744,7 +744,7 @@
     }
     .filter-container.carousel-mode { padding: 0; }
 
-    .recipes-section .section-header { padding: 0 24px; margin-bottom: 0; }
+    .recipes-section .section-header { padding: 0 16px; margin-bottom: 0; }
 
     .btn-mudar-filtros {
       display: flex; align-items: center; gap: 8px;
@@ -755,13 +755,13 @@
 
     .carousel-wrapper { width: 100%; overflow-x: clip; overflow-y: visible; padding: 20px 0 8px; }
     .carousel-track {
-      display: flex; align-items: center; gap: 16px;
-      padding: 0 72px;
+      display: flex; align-items: center; gap: 4px;
+      padding: 0 10vw;
       transition: transform .35s cubic-bezier(.4,0,.2,1);
       will-change: transform;
     }
     .carousel-card {
-      flex-shrink: 0; width: calc(100vw - 144px);
+      flex-shrink: 0; width: 80vw;
       background: var(--white); border-radius: var(--r-card);
       padding: 16px;
       display: flex; flex-direction: column; gap: 8px;
@@ -1459,8 +1459,8 @@ function setCarouselIndex(n) {
 function updateCarouselTransform() {
   const wrapper = document.getElementById('carouselWrapper');
   if (!wrapper) return;
-  const cardW  = wrapper.clientWidth - 144;
-  const gap    = 16;
+  const cardW  = wrapper.clientWidth * 0.8;
+  const gap    = 4;
   const offset = -state.carouselIndex * (cardW + gap);
   document.getElementById('carouselTrack').style.transform = `translateX(${offset}px)`;
 }
