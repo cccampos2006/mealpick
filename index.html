@@ -779,7 +779,8 @@
       .carousel-card { width: 400px; }
     }
     .carousel-image {
-      flex: 1; min-height: 220px;
+      aspect-ratio: 4/5;
+      width: 100%; flex-shrink: 0;
       border-radius: 8px; overflow: hidden;
       position: relative; background: var(--bg);
       display: flex; align-items: center; justify-content: center;
@@ -789,6 +790,13 @@
       object-fit: cover; display: block;
     }
     .carousel-emoji { font-size: 90px; line-height: 1; }
+    .pexels-credit {
+      font-size: 11px;
+      color: #9ca3af;
+      margin-top: 2px;
+    }
+    .pexels-credit a { color: inherit; text-decoration: underline; }
+    .modal-pexels-credit { margin: 0; padding: 4px 24px 0; }
     .carousel-card-name {
       font-family: var(--serif-body); font-size: 20px;
       color: var(--text); text-align: left;
@@ -988,10 +996,11 @@
      ===================================================== -->
 <div class="modal-overlay" id="recipeModal" onclick="handleModalClick(event)">
   <div class="modal">
-    <div class="modal-hero">
+    <div class="modal-hero" id="modalHero">
       <button class="modal-close" onclick="closeModal()">✕</button>
       <span id="modalEmoji"></span>
     </div>
+    <div id="modalPexelsCredit" class="pexels-credit modal-pexels-credit" style="display:none"></div>
     <div class="modal-body">
       <h2 class="modal-title" id="modalTitle"></h2>
       <div class="stats-row">
@@ -1255,6 +1264,7 @@ function renderRecipes() {
       <div class="carousel-image">
         ${r.imagem ? `<img src="${r.imagem}" alt="${r.nome}">` : `<span class="carousel-emoji">${r.emoji}</span>`}
       </div>
+      ${r.pexelsPhotographer ? `<div class="pexels-credit">Photo by <a href="${r.pexelsUrl}" target="_blank" rel="noopener noreferrer">${r.pexelsPhotographer}</a> on Pexels</div>` : ''}
       <div class="carousel-card-name">${r.nome}</div>
       <div class="carousel-card-info">
         <div class="carousel-info-item"><img src="icons/ic-time.svg" alt="tempo"> ${r.tempo}</div>
@@ -1289,7 +1299,22 @@ function renderRecipes() {
 // =========================================================
 function openModal(r) {
   state.activeRecipe = r;
-  document.getElementById('modalEmoji').textContent    = r.emoji;
+  const heroEl   = document.getElementById('modalHero');
+  const emojiEl  = document.getElementById('modalEmoji');
+  const creditEl = document.getElementById('modalPexelsCredit');
+  if (r.imagem && r.pexelsPhotographer) {
+    heroEl.style.backgroundImage    = `url(${r.imagem})`;
+    heroEl.style.backgroundSize     = 'cover';
+    heroEl.style.backgroundPosition = 'center';
+    emojiEl.style.display = 'none';
+    creditEl.innerHTML    = `Photo by <a href="${r.pexelsUrl}" target="_blank" rel="noopener noreferrer">${r.pexelsPhotographer}</a> on Pexels`;
+    creditEl.style.display = 'block';
+  } else {
+    heroEl.style.backgroundImage = '';
+    emojiEl.style.display        = '';
+    emojiEl.textContent          = r.emoji;
+    creditEl.style.display       = 'none';
+  }
   document.getElementById('modalTitle').textContent    = r.nome;
   document.getElementById('modalTempo').textContent    = r.tempo;
   document.getElementById('modalCusto').textContent    = r.custo;

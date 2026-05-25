@@ -9,6 +9,40 @@ function dishTypeToEmoji(dishTypes) {
   return DISH_TYPE_EMOJI[dishTypes[0]] || '🍽️';
 }
 
+const FILLER_WORDS = new Set([
+  'classic', 'creamy', 'spicy', 'easy', 'simple', 'homemade', 'best',
+  'quick', 'slow', 'roasted', 'baked', 'fried', 'grilled', 'fresh',
+  'healthy', 'crispy', 'one', 'pot', 'pan',
+]);
+
+function extractKeyword(title) {
+  const words = title.toLowerCase().split(/\s+/);
+  const meaningful = words.filter(w => !FILLER_WORDS.has(w));
+  return (meaningful.length > 0 ? meaningful : words).slice(0, 3).join(' ');
+}
+
+async function fetchPexelsImage(keyword) {
+  const key = process.env.PEXELS_API_KEY;
+  if (!key) return null;
+  const params = new URLSearchParams({
+    query: keyword + ' food',
+    per_page: '1',
+    orientation: 'portrait',
+  });
+  const res = await fetch(`https://api.pexels.com/v1/search?${params}`, {
+    headers: { Authorization: key },
+  });
+  if (!res.ok) return null;
+  const data = await res.json();
+  const photo = data.photos?.[0];
+  if (!photo) return null;
+  return {
+    imagem: photo.src.large,
+    pexelsPhotographer: photo.photographer,
+    pexelsUrl: photo.url,
+  };
+}
+
 function mapSpoonacularRecipe(result) {
   const pricePerServing = result.pricePerServing || 0;
   const nivelCusto = pricePerServing < 150 ? 1 : pricePerServing < 300 ? 2 : 3;
@@ -49,6 +83,7 @@ function buildSpoonacularUrl(tempo, ingredientes, restricoes) {
     maxReadyTime: tempo,
     maxIngredients: ingredientes,
     number: '3',
+    offset: String(Math.floor(Math.random() * 10)),
     addRecipeInformation: 'true',
     addRecipeNutrition: 'true',
     instructionsRequired: 'true',
@@ -65,7 +100,12 @@ async function fetchSpoonacular(tempo, ingredientes, restricoes) {
   const res = await fetch(url);
   if (!res.ok) return [];
   const data = await res.json();
-  return (data.results || []).map(mapSpoonacularRecipe);
+  const recipes = (data.results || []).map(mapSpoonacularRecipe);
+  const enhanced = await Promise.all(recipes.map(async (recipe) => {
+    const pexels = await fetchPexelsImage(extractKeyword(recipe.nome));
+    return pexels ? { ...recipe, ...pexels } : recipe;
+  }));
+  return enhanced;
 }
 
 async function fetchGemini(needed, tempo, pessoas, ingredientes, restricoes) {
