@@ -224,7 +224,7 @@
     .chip-restriction {
       height: 40px;
       min-width: 80px;
-      padding: 8px 16px;
+      padding: 8px 12px;
       border-radius: var(--r-chip);
       border: 1px solid var(--border-chip);
       background: transparent;
@@ -807,6 +807,13 @@
     .cost-icon { width: 24px; height: 24px; margin-right: -8px; }
     .cost-icon:last-child { margin-right: 0; }
     .cost-faded { opacity: 0.5; }
+    .ai-badge {
+      display: inline-block;
+      font-size: 11px; font-family: var(--sans); font-weight: 600;
+      color: #5f5145; background: rgba(95,81,69,0.10);
+      border: 1px solid rgba(95,81,69,0.20); border-radius: 20px;
+      padding: 2px 9px; margin-top: 8px; letter-spacing: 0.01em;
+    }
 
     .carousel-dots {
       display: flex; justify-content: center; gap: 8px;
@@ -1254,7 +1261,8 @@ function renderRecipes() {
         <div class="carousel-info-item"><img src="icons/ic-ingredients.svg" alt="ingredientes"> ${r.ingredientes.length} ingr.</div>
         <div class="carousel-info-item"><img src="icons/ic-calories.svg" alt="calorias"> ${r.calorias}</div>
         <div class="carousel-info-item">${renderCostIcons(r.nivelCusto || 1)}</div>
-      </div>`;
+      </div>
+      ${r.isAI ? '<div class="ai-badge">✨ Sugestão IA</div>' : ''}`;
     card.onclick = () => {
       const idx = parseInt(card.dataset.index);
       if (idx !== state.carouselIndex) setCarouselIndex(idx);

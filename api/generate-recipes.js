@@ -1,15 +1,79 @@
-module.exports = async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method Not Allowed' });
-  }
+const DISH_TYPE_EMOJI = {
+  soup: '🍲', salad: '🥗', breakfast: '🍳', dessert: '🍮',
+  'main course': '🍽️', lunch: '🥙', dinner: '🍖',
+  pasta: '🍝', pizza: '🍕', sandwich: '🥪', appetizer: '🥐',
+};
 
-  const { tempo, pessoas, ingredientes, restricoes } = req.body;
+function dishTypeToEmoji(dishTypes) {
+  if (!dishTypes?.length) return '🍽️';
+  return DISH_TYPE_EMOJI[dishTypes[0]] || '🍽️';
+}
 
+function mapSpoonacularRecipe(result) {
+  const pricePerServing = result.pricePerServing || 0;
+  const nivelCusto = pricePerServing < 150 ? 1 : pricePerServing < 300 ? 2 : 3;
+
+  const calorieEntry = result.nutrition?.nutrients?.find(n => n.name === 'Calories');
+  const calorias = calorieEntry ? `${Math.round(calorieEntry.amount)} kcal` : '-- kcal';
+
+  const ingredientes = (result.extendedIngredients || []).map(i =>
+    `${i.amount ? i.amount + ' ' : ''}${i.unit ? i.unit + ' ' : ''}${i.name}`.trim()
+  );
+
+  const passos = result.analyzedInstructions?.[0]?.steps?.map(s => s.step) || [];
+
+  return {
+    nome: result.title,
+    emoji: dishTypeToEmoji(result.dishTypes),
+    imagem: result.image || null,
+    tempo: `${result.readyInMinutes} min`,
+    nivelCusto,
+    calorias,
+    ingredientes,
+    passos,
+    tags: result.diets || [],
+    isAI: false,
+  };
+}
+
+function buildSpoonacularUrl(tempo, ingredientes, restricoes) {
+  const dietMap = { 'vegetariano': 'vegetarian', 'vegano': 'vegan' };
+  const intoleranceMap = { 'sem lactose': 'dairy', 'sem glúten': 'gluten' };
+
+  const diets = restricoes.filter(r => dietMap[r]).map(r => dietMap[r]);
+  const diet = diets.includes('vegan') ? 'vegan' : (diets.includes('vegetarian') ? 'vegetarian' : '');
+  const intolerances = restricoes.filter(r => intoleranceMap[r]).map(r => intoleranceMap[r]).join(',');
+
+  const params = new URLSearchParams({
+    apiKey: process.env.SPOONACULAR_API_KEY,
+    maxReadyTime: tempo,
+    maxIngredients: ingredientes,
+    number: '3',
+    addRecipeInformation: 'true',
+    addRecipeNutrition: 'true',
+    instructionsRequired: 'true',
+    fillIngredients: 'true',
+  });
+  if (diet) params.set('diet', diet);
+  if (intolerances) params.set('intolerances', intolerances);
+
+  return `https://api.spoonacular.com/recipes/complexSearch?${params}`;
+}
+
+async function fetchSpoonacular(tempo, ingredientes, restricoes) {
+  const url = buildSpoonacularUrl(tempo, ingredientes, restricoes);
+  const res = await fetch(url);
+  if (!res.ok) return [];
+  const data = await res.json();
+  return (data.results || []).map(mapSpoonacularRecipe);
+}
+
+async function fetchGemini(needed, tempo, pessoas, ingredientes, restricoes) {
   const restricoesTexto = restricoes.length > 0
     ? `As receitas devem ser ${restricoes.join(', ')}.`
     : 'Sem restrições alimentares específicas.';
 
-  const prompt = `Sugere exactamente 3 receitas de cozinha para as seguintes condições:
+  const prompt = `Sugere exactamente ${needed} receitas de cozinha para as seguintes condições:
 - Tempo máximo de preparação: ${tempo} minutos
 - Número de pessoas: ${pessoas}
 - Máximo de ingredientes: ${ingredientes} (NÃO contes sal, pimenta, azeite ou água)
@@ -30,30 +94,49 @@ Cada receita deve ter exactamente esta estrutura:
 
 Regras: NÃO incluas sal, pimenta, azeite ou água nos ingredientes. Receitas realistas e portuguesas. nivelCusto deve ser 1 (barato), 2 (médio) ou 3 (caro).`;
 
-  try {
-    const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.8, maxOutputTokens: 4096 },
-        }),
-      }
-    );
+  const geminiRes = await fetch(
+    `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.8, maxOutputTokens: 4096 },
+      }),
+    }
+  );
 
-    if (!geminiRes.ok) {
-      const details = await geminiRes.text();
-      return res.status(geminiRes.status).json({ error: `Gemini error ${geminiRes.status}`, details });
+  if (!geminiRes.ok) throw new Error(`Gemini error ${geminiRes.status}`);
+
+  const data = await geminiRes.json();
+  const text = data.candidates[0].content.parts[0].text;
+  const recipes = JSON.parse(text.replace(/```json|```/g, '').trim());
+  return recipes.map(r => ({ ...r, isAI: true }));
+}
+
+module.exports = async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method Not Allowed' });
+  }
+
+  const { tempo, pessoas, ingredientes, restricoes } = req.body;
+
+  try {
+    let spoonacularRecipes = [];
+    try {
+      spoonacularRecipes = await fetchSpoonacular(tempo, ingredientes || '10', restricoes);
+    } catch (_) {
+      // Spoonacular failure → fall through to Gemini for all 3
     }
 
-    const data = await geminiRes.json();
-    const text = data.candidates[0].content.parts[0].text;
-    const recipes = JSON.parse(text.replace(/```json|```/g, '').trim());
+    const needed = 3 - spoonacularRecipes.length;
+    let geminiRecipes = [];
+    if (needed > 0) {
+      geminiRecipes = await fetchGemini(needed, tempo, pessoas, ingredientes || '10', restricoes);
+    }
 
-    return res.status(200).json(recipes);
+    return res.status(200).json([...spoonacularRecipes, ...geminiRecipes]);
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
-}
+};
