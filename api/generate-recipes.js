@@ -117,12 +117,10 @@ async function fetchGemini(needed, tempo, ingredientes, restricoes) {
 
   const prompt = `Sugere exactamente ${needed} receitas de refeições principais (almoço ou jantar) para as seguintes condições. NÃO incluas pequeno-almoços, sobremesas, aperitivos, bebidas nem acompanhamentos.
 - Tempo máximo de preparação: ${tempo} minutos
-- Máximo de ingredientes: ${ingredientes} no total (conta tudo, incluindo sal, pimenta, azeite, água)
-- IMPORTANTE: o array "ingredientes" deve ter NO MÁXIMO ${ingredientes} itens. Conta antes de responder.
+- Máximo de ingredientes: ${ingredientes} (NÃO contes sal, pimenta, azeite ou água)
 - ${restricoesTexto}
 
-Responde APENAS com um array JSON válido, sem texto adicional, sem markdown, sem backticks.
-Cada receita deve ter exactamente esta estrutura:
+Devolve um array JSON com exactamente ${needed} receita(s). Cada receita deve ter exactamente esta estrutura:
 {
   "nome": "Nome da receita",
   "emoji": "1 emoji representativo",
@@ -134,8 +132,7 @@ Cada receita deve ter exactamente esta estrutura:
   "tags": ["tag1", "tag2"]
 }
 
-Regras: Receitas realistas e portuguesas. nivelCusto deve ser 1 (barato), 2 (médio) ou 3 (caro).
-REGRA FINAL: cada array "ingredientes" tem OBRIGATORIAMENTE ${ingredientes} ou menos elementos. Verifica antes de responder.`;
+Regras: NÃO incluas sal, pimenta, azeite ou água nos ingredientes. Receitas realistas e portuguesas. nivelCusto deve ser 1 (barato), 2 (médio) ou 3 (caro).`;
 
   const geminiRes = await fetch(
     `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
@@ -144,7 +141,7 @@ REGRA FINAL: cada array "ingredientes" tem OBRIGATORIAMENTE ${ingredientes} ou m
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.8, maxOutputTokens: 4096 },
+        generationConfig: { temperature: 0.8, maxOutputTokens: 4096, responseMimeType: 'application/json' },
       }),
     }
   );
@@ -153,14 +150,8 @@ REGRA FINAL: cada array "ingredientes" tem OBRIGATORIAMENTE ${ingredientes} ou m
 
   const data = await geminiRes.json();
   const text = data.candidates[0].content.parts[0].text;
-  const recipes = JSON.parse(text.replace(/```json|```/g, '').trim());
+  const recipes = JSON.parse(text);
   return recipes.map(r => ({ ...r, isAI: true }));
-}
-
-function enforceIngredientLimit(recipes, max) {
-  const limit = parseInt(max, 10);
-  if (isNaN(limit)) return recipes;
-  return recipes.filter(r => Array.isArray(r.ingredientes) && r.ingredientes.length <= limit);
 }
 
 module.exports = async function handler(req, res) {
@@ -169,7 +160,7 @@ module.exports = async function handler(req, res) {
   }
 
   const { tempo, ingredientes, restricoes } = req.body;
-  const maxIngr = ingredientes || '20';
+  const maxIngr = ingredientes || '10';
 
   try {
     let spoonacularRecipes = [];
@@ -179,14 +170,32 @@ module.exports = async function handler(req, res) {
       // Spoonacular failure → fall through to Gemini for all 3
     }
 
-    const needed = 3 - spoonacularRecipes.length;
-    let geminiRecipes = [];
-    if (needed > 0) {
-      geminiRecipes = await fetchGemini(needed, tempo, maxIngr, restricoes);
+    async function getGeminiWithImages(count) {
+      try {
+        const raw = await fetchGemini(count, tempo, maxIngr, restricoes);
+        const enhanced = await Promise.all(raw.map(async (recipe) => {
+          const pexels = await fetchPexelsImage(extractKeyword(recipe.nome));
+          return pexels ? { ...recipe, ...pexels } : recipe;
+        }));
+        return enhanced.slice(0, count);
+      } catch (err) {
+        console.error('[Gemini] failed:', err.message);
+        return [];
+      }
     }
 
-    const all = enforceIngredientLimit([...spoonacularRecipes, ...geminiRecipes], maxIngr);
-    return res.status(200).json(all);
+    const needed = 3 - spoonacularRecipes.length;
+    let geminiRecipes = needed > 0 ? await getGeminiWithImages(needed) : [];
+
+    let combined = [...spoonacularRecipes, ...geminiRecipes];
+
+    // Retry once if we still have fewer than 3
+    if (combined.length < 3) {
+      const retry = await getGeminiWithImages(3 - combined.length);
+      combined = [...combined, ...retry];
+    }
+
+    return res.status(200).json(combined.slice(0, 3));
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
