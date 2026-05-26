@@ -80,6 +80,9 @@
       width: 100%;
       flex-shrink: 0;
     }
+    .page:has(.filter-container.carousel-mode) .header {
+      display: none;
+    }
     .hero-img-wrap {
       flex: 1 0 0;
       min-width: 1px;
@@ -744,7 +747,7 @@
     }
     .filter-container.carousel-mode { padding: 0; }
 
-    .recipes-section .section-header { padding: 0 16px; margin-bottom: 0; }
+    .recipes-section .section-header { padding: 16px 16px 16px 16px; margin-bottom: 0; }
 
     .btn-mudar-filtros {
       display: flex; align-items: center; gap: 8px;
@@ -753,26 +756,24 @@
       color: var(--green); cursor: pointer;
     }
 
-    .carousel-wrapper { width: 100%; overflow-x: clip; overflow-y: visible; padding: 20px 0 8px; }
+    .carousel-wrapper { width: 100%; overflow: hidden; padding: 20px 0 8px; }
     .carousel-track {
-      display: flex; align-items: center; gap: 4px;
-      padding: 0 10vw;
-      transition: transform .35s cubic-bezier(.4,0,.2,1);
-      will-change: transform;
+      position: relative;
+      width: 100%;
     }
     .carousel-card {
-      flex-shrink: 0; width: 80vw;
+      position: absolute; left: 50%; top: 0;
+      width: 80vw;
       background: var(--white); border-radius: var(--r-card);
       padding: 16px;
       display: flex; flex-direction: column; gap: 8px;
       cursor: pointer; box-sizing: border-box;
-      transform: scale(.87); opacity: .65;
+      transform: translateX(-50%) scale(0.75); opacity: 0;
       box-shadow: 0px 12px 18px 0px rgba(0,0,0,0.1);
-      transition: transform .35s ease, opacity .35s ease, box-shadow .35s ease;
-      position: relative;
+      transition: transform .35s cubic-bezier(.4,0,.2,1), opacity .35s ease, box-shadow .35s ease;
     }
     .carousel-card.active {
-      transform: scale(1); opacity: 1;
+      transform: translateX(-50%) scale(1); opacity: 1;
       box-shadow: 0px 20px 28px 0px rgba(0,0,0,0.1);
     }
     @media (min-width: 600px) {
@@ -791,12 +792,12 @@
     }
     .carousel-emoji { font-size: 90px; line-height: 1; }
     .pexels-credit {
-      font-size: 11px;
+      font-size: 9px;
       color: #9ca3af;
       margin-top: 2px;
     }
     .pexels-credit a { color: inherit; text-decoration: underline; }
-    .modal-pexels-credit { margin: 0; padding: 4px 24px 0; }
+    .modal-pexels-credit { margin: 0; padding: 0px 24px 0; }
     .carousel-card-name {
       font-family: var(--serif-body); font-size: 20px;
       color: var(--text); text-align: left;
@@ -882,22 +883,7 @@
             </div>
           </div>
 
-          <!-- 2. Pessoas -->
-          <div class="filter-block">
-            <div class="filter-header">
-              <img class="filter-header-icon" src="icons/ic-people.svg" alt="" width="24" height="24">
-              <span class="filter-header-label">Nº de pessoas</span>
-            </div>
-            <div class="chip-row" id="pessoasGroup">
-              <div class="chip-slider"></div>
-              <button class="chip selected" data-value="1" onclick="selectChip('pessoas', this)">1</button>
-              <button class="chip" data-value="2" onclick="selectChip('pessoas', this)">2</button>
-              <button class="chip" data-value="3" onclick="selectChip('pessoas', this)">3</button>
-              <button class="chip" data-value="4" onclick="selectChip('pessoas', this)">+4</button>
-            </div>
-          </div>
-
-          <!-- 3. Ingredientes -->
+          <!-- 2. Ingredientes -->
           <div class="filter-block">
             <div class="filter-header">
               <img class="filter-header-icon" src="icons/ic-ingredients.svg" alt="" width="24" height="24">
@@ -930,7 +916,7 @@
 
         <!-- Error -->
         <div class="error-msg" id="errorMsg" style="margin-top:12px;">
-          ⚠ Selecciona pelo menos o tempo e o número de pessoas.
+          ⚠ Selecciona pelo menos o tempo de preparação.
         </div>
 
         <!-- Submit -->
@@ -1068,7 +1054,6 @@
 // =========================================================
 const state = {
   tempo: '15',
-  pessoas: '1',
   restricoes: [],
   ingredientes: '4',
   recipes: [],
@@ -1181,7 +1166,7 @@ function toggleCheck(btn) {
 // =========================================================
 // VALIDAÇÃO
 // =========================================================
-function validate()  { return state.tempo !== null && state.pessoas !== null; }
+function validate()  { return state.tempo !== null; }
 function showError() { document.getElementById('errorMsg').classList.add('visible'); }
 function hideError() { document.getElementById('errorMsg').classList.remove('visible'); }
 
@@ -1200,7 +1185,6 @@ async function generateRecipes() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         tempo: state.tempo,
-        pessoas: state.pessoas,
         ingredientes: state.ingredientes || '10',
         restricoes: state.restricoes,
       }),
@@ -1291,7 +1275,12 @@ function renderRecipes() {
   document.querySelector('.filter-container').classList.add('carousel-mode');
   document.getElementById('recipesSection').classList.add('visible');
   document.getElementById('formCard').style.display = 'none';
-  updateCarouselTransform();
+  requestAnimationFrame(() => {
+    const track = document.getElementById('carouselTrack');
+    const activeCard = track?.querySelector('.carousel-card.active');
+    if (track && activeCard) track.style.height = activeCard.offsetHeight + 'px';
+    positionCarouselCards();
+  });
 }
 
 // =========================================================
@@ -1482,22 +1471,51 @@ function resetForm() {
 // =========================================================
 // CAROUSEL — navegação e swipe
 // =========================================================
-function setCarouselIndex(n) {
-  state.carouselIndex = n;
-  document.querySelectorAll('.carousel-card').forEach((c, i) => c.classList.toggle('active', i === n));
-  document.querySelectorAll('.dot').forEach((d, i)           => d.classList.toggle('active', i === n));
-  updateCarouselTransform();
+function positionCarouselCards() {
+  const cards = [...document.querySelectorAll('.carousel-card')];
+  const total = cards.length;
+  const wrapper = document.getElementById('carouselWrapper');
+  if (!wrapper || !total) return;
+
+  const cardW = wrapper.clientWidth * 0.8;
+  const sideOffset = cardW * 0.62;
+
+  cards.forEach((card, i) => {
+    const raw = i - state.carouselIndex;
+    const dist = ((raw % total) + total) % total;
+    const pos = dist > Math.floor(total / 2) ? dist - total : dist;
+
+    card.classList.toggle('active', pos === 0);
+
+    if (pos === 0) {
+      card.style.transform = 'translateX(-50%) scale(1)';
+      card.style.opacity = '1';
+      card.style.zIndex = '3';
+      card.style.pointerEvents = 'auto';
+    } else if (Math.abs(pos) === 1) {
+      const x = pos * sideOffset;
+      card.style.transform = `translateX(calc(-50% + ${x}px)) scale(0.82)`;
+      card.style.opacity = '0.65';
+      card.style.zIndex = '2';
+      card.style.pointerEvents = 'auto';
+    } else {
+      const dir = pos > 0 ? 1 : -1;
+      card.style.transform = `translateX(calc(-50% + ${dir * sideOffset * 2}px)) scale(0.75)`;
+      card.style.opacity = '0';
+      card.style.zIndex = '1';
+      card.style.pointerEvents = 'none';
+    }
+  });
 }
 
-function updateCarouselTransform() {
-  const wrapper = document.getElementById('carouselWrapper');
-  if (!wrapper) return;
-  const cardW  = wrapper.clientWidth * 0.8;
-  const gap    = 4;
-  const offset = -state.carouselIndex * (cardW + gap);
-  document.getElementById('carouselTrack').style.transform = `translateX(${offset}px)`;
+function setCarouselIndex(n) {
+  const total = state.recipes.length;
+  state.carouselIndex = ((n % total) + total) % total;
+  positionCarouselCards();
+  document.querySelectorAll('.dot').forEach((d, i) =>
+    d.classList.toggle('active', i === state.carouselIndex));
 }
-window.addEventListener('resize', updateCarouselTransform);
+window.addEventListener('resize', positionCarouselCards);
 
 function mudarFiltros() {
   document.getElementById('filtersPanel').classList.remove('panel-transparent');
@@ -1516,10 +1534,11 @@ function initCarouselSwipe() {
   section.addEventListener('touchend', e => {
     const dx = e.changedTouches[0].clientX - startX;
     if (Math.abs(dx) < 40) return;
+    const total = state.recipes.length;
     const n = dx < 0
-      ? Math.min(state.carouselIndex + 1, state.recipes.length - 1)
-      : Math.max(state.carouselIndex - 1, 0);
-    if (n !== state.carouselIndex) setCarouselIndex(n);
+      ? (state.carouselIndex + 1) % total
+      : (state.carouselIndex - 1 + total) % total;
+    setCarouselIndex(n);
   }, { passive: true });
 }
 initCarouselSwipe();

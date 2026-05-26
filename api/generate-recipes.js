@@ -45,7 +45,7 @@ async function fetchPexelsImage(keyword) {
 
 function mapSpoonacularRecipe(result) {
   const pricePerServing = result.pricePerServing || 0;
-  const nivelCusto = pricePerServing < 150 ? 1 : pricePerServing < 300 ? 2 : 3;
+  const nivelCusto = pricePerServing < 300 ? 1 : pricePerServing < 700 ? 2 : 3;
 
   const calorieEntry = result.nutrition?.nutrients?.find(n => n.name === 'Calories');
   const calorias = calorieEntry ? `${Math.round(calorieEntry.amount)} kcal` : '-- kcal';
@@ -108,14 +108,13 @@ async function fetchSpoonacular(tempo, ingredientes, restricoes) {
   return enhanced;
 }
 
-async function fetchGemini(needed, tempo, pessoas, ingredientes, restricoes) {
+async function fetchGemini(needed, tempo, ingredientes, restricoes) {
   const restricoesTexto = restricoes.length > 0
     ? `As receitas devem ser ${restricoes.join(', ')}.`
     : 'Sem restrições alimentares específicas.';
 
   const prompt = `Sugere exactamente ${needed} receitas de cozinha para as seguintes condições:
 - Tempo máximo de preparação: ${tempo} minutos
-- Número de pessoas: ${pessoas}
 - Máximo de ingredientes: ${ingredientes} (NÃO contes sal, pimenta, azeite ou água)
 - ${restricoesTexto}
 
@@ -159,7 +158,7 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
-  const { tempo, pessoas, ingredientes, restricoes } = req.body;
+  const { tempo, ingredientes, restricoes } = req.body;
 
   try {
     let spoonacularRecipes = [];
@@ -172,7 +171,7 @@ module.exports = async function handler(req, res) {
     const needed = 3 - spoonacularRecipes.length;
     let geminiRecipes = [];
     if (needed > 0) {
-      geminiRecipes = await fetchGemini(needed, tempo, pessoas, ingredientes || '10', restricoes);
+      geminiRecipes = await fetchGemini(needed, tempo, ingredientes || '10', restricoes);
     }
 
     return res.status(200).json([...spoonacularRecipes, ...geminiRecipes]);
