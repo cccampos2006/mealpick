@@ -756,7 +756,7 @@
       color: var(--green); cursor: pointer;
     }
 
-    .carousel-wrapper { width: 100%; overflow: hidden; padding: 20px 0 8px; }
+    .carousel-wrapper { width: 100%; overflow-x: clip; padding: 8px 0 8px; }
     .carousel-track {
       position: relative;
       width: 100%;
@@ -774,7 +774,7 @@
     }
     .carousel-card.active {
       transform: translateX(-50%) scale(1); opacity: 1;
-      box-shadow: 0px 20px 28px 0px rgba(0,0,0,0.1);
+      box-shadow: 0px 16px 28px 0px rgba(0,0,0,0.2);
     }
     @media (min-width: 600px) {
       .carousel-card { width: 400px; }
@@ -794,7 +794,7 @@
     .pexels-credit {
       font-size: 9px;
       color: #9ca3af;
-      margin-top: 2px;
+      margin-top: -4px;
     }
     .pexels-credit a { color: inherit; text-decoration: underline; }
     .modal-pexels-credit { margin: 0; padding: 0px 24px 0; }
@@ -1206,10 +1206,10 @@ async function generateRecipes() {
 // =========================================================
 function getFallback() {
   return [
-    { nome:"Ovos Mexidos com Torrada", emoji:"🍳", imagem:"https://www.figma.com/api/mcp/asset/0512f129-c4a1-4cd4-8adb-14150f8c4bca", tempo:"10 min", nivelCusto:1, calorias:"320 kcal",
-      ingredientes:["3 ovos", "2 fatias de pão de forma", "1 col. sopa de manteiga"],
-      passos:["Parte os ovos para uma taça.", "Derrete a manteiga em frigideira a lume médio.", "Mexe os ovos lentamente até cremosos.", "Serve com o pão tostado."],
-      tags:["rápido","económico"] },
+    { nome:"Frango Assado com Batatas", emoji:"🍗", imagem:null, tempo:"50 min", nivelCusto:2, calorias:"520 kcal",
+      ingredientes:["4 coxas de frango", "500g batatas", "2 dentes de alho", "sumo de 1 limão"],
+      passos:["Pré-aquece o forno a 200°C.", "Tempera o frango com alho picado, limão e ervas.", "Coloca numa assadeira com as batatas cortadas.", "Assa 45 min até dourar."],
+      tags:["fácil","sem glúten"] },
     { nome:"Massa com Atum e Tomate", emoji:"🍝", imagem:"https://www.figma.com/api/mcp/asset/0512f129-c4a1-4cd4-8adb-14150f8c4bca", tempo:"20 min", nivelCusto:2, calorias:"480 kcal",
       ingredientes:["200g esparguete", "1 lata de atum", "1 lata de tomate pelado", "2 dentes de alho"],
       passos:["Coze a massa conforme instruções.", "Refoga o alho picado 1 min.", "Adiciona o tomate e reduz 5 min.", "Junta o atum e mistura com a massa escorrida."],

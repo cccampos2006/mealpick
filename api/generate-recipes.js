@@ -11,7 +11,7 @@ function dishTypeToEmoji(dishTypes) {
 
 const FILLER_WORDS = new Set([
   'classic', 'creamy', 'spicy', 'easy', 'simple', 'homemade', 'best',
-  'quick', 'slow', 'roasted', 'baked', 'fried', 'grilled', 'fresh',
+  'quick', 'slow', 'baked', 'fresh',
   'healthy', 'crispy', 'one', 'pot', 'pan',
 ]);
 
@@ -83,7 +83,8 @@ function buildSpoonacularUrl(tempo, ingredientes, restricoes) {
     maxReadyTime: tempo,
     maxIngredients: ingredientes,
     number: '3',
-    offset: String(Math.floor(Math.random() * 10)),
+    sort: 'random',
+    type: 'main course',
     addRecipeInformation: 'true',
     addRecipeNutrition: 'true',
     instructionsRequired: 'true',
@@ -113,7 +114,7 @@ async function fetchGemini(needed, tempo, ingredientes, restricoes) {
     ? `As receitas devem ser ${restricoes.join(', ')}.`
     : 'Sem restrições alimentares específicas.';
 
-  const prompt = `Sugere exactamente ${needed} receitas de cozinha para as seguintes condições:
+  const prompt = `Sugere exactamente ${needed} receitas de refeições principais (almoço ou jantar) para as seguintes condições. NÃO incluas pequeno-almoços, sobremesas, aperitivos, bebidas nem acompanhamentos.
 - Tempo máximo de preparação: ${tempo} minutos
 - Máximo de ingredientes: ${ingredientes} (NÃO contes sal, pimenta, azeite ou água)
 - ${restricoesTexto}
