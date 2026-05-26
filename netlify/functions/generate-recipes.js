@@ -170,16 +170,34 @@ exports.handler = async (event) => {
       // Spoonacular failure → fall through to Gemini for all 3
     }
 
+    async function getGeminiWithImages(count) {
+      try {
+        const raw = await fetchGemini(count, tempo, pessoas, ingredientes || '10', restricoes);
+        const enhanced = await Promise.all(raw.map(async (recipe) => {
+          const pexels = await fetchPexelsImage(extractKeyword(recipe.nome));
+          return pexels ? { ...recipe, ...pexels } : recipe;
+        }));
+        return enhanced.slice(0, count);
+      } catch (_) {
+        return [];
+      }
+    }
+
     const needed = 3 - spoonacularRecipes.length;
-    let geminiRecipes = [];
-    if (needed > 0) {
-      geminiRecipes = await fetchGemini(needed, tempo, pessoas, ingredientes || '10', restricoes);
+    let geminiRecipes = needed > 0 ? await getGeminiWithImages(needed) : [];
+
+    let combined = [...spoonacularRecipes, ...geminiRecipes];
+
+    // Retry once if we still have fewer than 3
+    if (combined.length < 3) {
+      const retry = await getGeminiWithImages(3 - combined.length);
+      combined = [...combined, ...retry];
     }
 
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify([...spoonacularRecipes, ...geminiRecipes]),
+      body: JSON.stringify(combined.slice(0, 3)),
     };
   } catch (err) {
     return {
