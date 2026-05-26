@@ -109,19 +109,17 @@ async function fetchSpoonacular(tempo, ingredientes, restricoes) {
   return enhanced;
 }
 
-async function fetchGemini(needed, tempo, pessoas, ingredientes, restricoes) {
+async function fetchGemini(needed, tempo, ingredientes, restricoes) {
   const restricoesTexto = restricoes.length > 0
     ? `As receitas devem ser ${restricoes.join(', ')}.`
     : 'Sem restrições alimentares específicas.';
 
   const prompt = `Sugere exactamente ${needed} receitas de refeições principais (almoço ou jantar) para as seguintes condições. NÃO incluas pequeno-almoços, sobremesas, aperitivos, bebidas nem acompanhamentos.
 - Tempo máximo de preparação: ${tempo} minutos
-- Número de pessoas: ${pessoas}
 - Máximo de ingredientes: ${ingredientes} (NÃO contes sal, pimenta, azeite ou água)
 - ${restricoesTexto}
 
-Responde APENAS com um array JSON válido, sem texto adicional, sem markdown, sem backticks.
-Cada receita deve ter exactamente esta estrutura:
+Devolve um array JSON com exactamente ${needed} receita(s). Cada receita deve ter exactamente esta estrutura:
 {
   "nome": "Nome da receita",
   "emoji": "1 emoji representativo",
@@ -142,7 +140,7 @@ Regras: NÃO incluas sal, pimenta, azeite ou água nos ingredientes. Receitas re
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.8, maxOutputTokens: 4096 },
+        generationConfig: { temperature: 0.8, maxOutputTokens: 4096, responseMimeType: 'application/json' },
       }),
     }
   );
@@ -151,7 +149,7 @@ Regras: NÃO incluas sal, pimenta, azeite ou água nos ingredientes. Receitas re
 
   const data = await res.json();
   const text = data.candidates[0].content.parts[0].text;
-  const recipes = JSON.parse(text.replace(/```json|```/g, '').trim());
+  const recipes = JSON.parse(text);
   return recipes.map(r => ({ ...r, isAI: true }));
 }
 
@@ -160,7 +158,7 @@ exports.handler = async (event) => {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
-  const { tempo, pessoas, ingredientes, restricoes } = JSON.parse(event.body);
+  const { tempo, ingredientes, restricoes } = JSON.parse(event.body);
 
   try {
     let spoonacularRecipes = [];
@@ -172,13 +170,14 @@ exports.handler = async (event) => {
 
     async function getGeminiWithImages(count) {
       try {
-        const raw = await fetchGemini(count, tempo, pessoas, ingredientes || '10', restricoes);
+        const raw = await fetchGemini(count, tempo, ingredientes || '10', restricoes);
         const enhanced = await Promise.all(raw.map(async (recipe) => {
           const pexels = await fetchPexelsImage(extractKeyword(recipe.nome));
           return pexels ? { ...recipe, ...pexels } : recipe;
         }));
         return enhanced.slice(0, count);
-      } catch (_) {
+      } catch (err) {
+        console.error('[Gemini] failed:', err.message);
         return [];
       }
     }
