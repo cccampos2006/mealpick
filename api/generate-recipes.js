@@ -117,7 +117,7 @@ async function fetchGemini(needed, tempo, ingredientes, restricoes) {
 
   const prompt = `Sugere exactamente ${needed} receitas de refeições principais (almoço ou jantar) para as seguintes condições. NÃO incluas pequeno-almoços, sobremesas, aperitivos, bebidas nem acompanhamentos.
 - Tempo máximo de preparação: ${tempo} minutos
-- Máximo de ingredientes: ${ingredientes} (NÃO contes sal, pimenta, azeite ou água)
+- Máximo de ingredientes: ${ingredientes} no total (conta TODOS os ingredientes, incluindo sal, pimenta, azeite, água, etc.)
 - ${restricoesTexto}
 
 Devolve um array JSON com exactamente ${needed} receita(s). Cada receita deve ter exactamente esta estrutura:
@@ -132,7 +132,7 @@ Devolve um array JSON com exactamente ${needed} receita(s). Cada receita deve te
   "tags": ["tag1", "tag2"]
 }
 
-Regras: NÃO incluas sal, pimenta, azeite ou água nos ingredientes. Receitas realistas e portuguesas. nivelCusto deve ser 1 (barato), 2 (médio) ou 3 (caro).`;
+Regras: Receitas realistas e portuguesas. nivelCusto deve ser 1 (barato), 2 (médio) ou 3 (caro).`;
 
   const geminiRes = await fetch(
     `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
