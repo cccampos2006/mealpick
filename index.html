@@ -747,14 +747,18 @@
     }
     .filter-container.carousel-mode { padding: 0; }
 
-    .recipes-section .section-header { padding: 16px 16px 16px 16px; margin-bottom: 0; }
+    .recipes-section .section-header { padding: 16px 16px 16px 24px; margin-bottom: 0; }
 
     .btn-mudar-filtros {
       display: flex; align-items: center; gap: 8px;
-      background: transparent; border: none;
-      font-family: var(--serif-body); font-size: 15px;
+      height: 48px; padding: 14px 24px;
+      border-radius: var(--r-btn); border: none;
+      background: transparent;
+      font-family: var(--serif-body); font-size: 16px;
       color: var(--green); cursor: pointer;
+      transition: background var(--transition);
     }
+    .btn-mudar-filtros:hover { background: rgba(53,77,63,.08); }
 
     .carousel-wrapper { width: 100%; overflow-x: clip; padding: 8px 0 8px; }
     .carousel-track {
@@ -834,6 +838,93 @@
       cursor: pointer; padding: 0; transition: all .25s ease;
     }
     .dot.active { background: var(--green); width: 24px; border-radius: 4px; }
+
+    /* =====================================================
+       RECIPE PAGE
+       ===================================================== */
+    .recipe-page-section { display: none; width: 100%; }
+    .recipe-page-section.visible { display: flex; flex-direction: column; gap: 8px; }
+    .rp-header {
+      display: flex; align-items: center;
+      padding: 0px 16px 0px 16px;
+    }
+    .btn-voltar {
+      display: flex; align-items: center; gap: 8px;
+      height: 48px; padding: 14px 16px;
+      border-radius: 12px; border: none;
+      background: transparent;
+      font-family: var(--serif-body); font-size: 16px;
+      color: var(--green); cursor: pointer;
+      transition: background var(--transition);
+    }
+    .btn-voltar:hover { background: rgba(53,77,63,.08); }
+
+    .recipe-page-content {
+      display: flex; flex-direction: column; gap: 24px;
+      padding: 0 16px;
+    }
+    .rp-image-stack {
+      display: flex; flex-direction: column; align-items: center; width: 100%;
+    }
+    .rp-image-wrap {
+      width: 100%; height: 35vh;
+      border-radius: 8px; overflow: hidden;
+      box-shadow: 0px 8px 6px rgba(0,0,0,0.1);
+      position: relative;
+      margin-bottom: -48px;
+      flex-shrink: 0; background: var(--bg);
+    }
+    .rp-image { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .rp-emoji {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 72px; pointer-events: none;
+    }
+    .rp-fav-btn {
+      position: absolute; top: 8px; right: 8px;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--green); border: none;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0px 8px 8px rgba(0,0,0,0.25);
+      cursor: pointer; transition: background var(--transition);
+    }
+    .rp-fav-btn:hover { background: var(--green-hover); }
+    .rp-fav-btn.saved { background: #8b2020; }
+    .rp-fav-btn img { filter: brightness(0) invert(1); width: 24px; height: 24px; }
+    .rp-info-card {
+      background: var(--white); border-radius: var(--r-card);
+      box-shadow: 0px 16px 28px rgba(0,0,0,0.16);
+      padding: 8px 16px 8px; width: calc(100% - 32px);
+      position: relative; z-index: 1;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .rp-title {
+      font-family: var(--serif-body); font-size: 24px;
+      font-weight: 400; color: var(--text); line-height: 1.25;
+    }
+    .rp-stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 8px; padding: 0px 8px 0px 8px; }
+    .rp-stat-item {
+      display: flex; align-items: center; gap: 8px; padding: 8px 0;
+      font-family: var(--serif-body); font-size: 16px; color: var(--text);
+    }
+    .rp-stat-item img { width: 24px; height: 24px; flex-shrink: 0; }
+    .rp-section { display: flex; flex-direction: column; gap: 8px; }
+    .rp-section-header { display: flex; align-items: center; gap: 8px; }
+    .rp-section-header img { width: 24px; height: 24px; flex-shrink: 0; }
+    .rp-section-title {
+      font-family: var(--serif-body); font-size: 24px;
+      color: var(--text); font-weight: 400;
+    }
+    .rp-ingredients { list-style: disc; padding-left: 24px; }
+    .rp-ingredients li {
+      font-family: var(--serif-body); font-size: 16px;
+      color: var(--text); padding: 8px 0; line-height: 1.5;
+    }
+    .rp-steps { list-style: decimal; padding-left: 24px; }
+    .rp-steps li {
+      font-family: var(--serif-body); font-size: 16px;
+      color: var(--text); padding: 8px 0; line-height: 1.5;
+    }
   </style>
 </head>
 <body>
@@ -891,10 +982,10 @@
             </div>
             <div class="chip-row" id="ingredientesGroup">
               <div class="chip-slider"></div>
-              <button class="chip selected" data-value="4"  onclick="selectChip('ingredientes', this)">4</button>
-              <button class="chip" data-value="6"  onclick="selectChip('ingredientes', this)">6</button>
-              <button class="chip" data-value="8"  onclick="selectChip('ingredientes', this)">8</button>
-              <button class="chip" data-value="10" onclick="selectChip('ingredientes', this)">+10</button>
+              <button class="chip selected" data-value="8"  onclick="selectChip('ingredientes', this)">8</button>
+              <button class="chip" data-value="10" onclick="selectChip('ingredientes', this)">10</button>
+              <button class="chip" data-value="14" onclick="selectChip('ingredientes', this)">14</button>
+              <button class="chip" data-value="20" onclick="selectChip('ingredientes', this)">+14</button>
             </div>
           </div>
 
@@ -952,6 +1043,59 @@
         </div>
       </div>
 
+      <!-- Recipe Page -->
+      <div class="recipe-page-section" id="recipePageSection">
+        <div class="rp-header">
+          <button class="btn-voltar" onclick="voltarSugestoes()">
+            <img src="icons/ic-back.svg" alt="" width="24" height="24"> Voltar às sugestões
+          </button>
+        </div>
+        <div class="recipe-page-content">
+          <div class="rp-image-stack">
+            <div class="rp-image-wrap">
+              <img class="rp-image" id="rpImage" src="" alt="">
+              <span class="rp-emoji" id="rpEmoji"></span>
+              <button class="rp-fav-btn" id="rpFavBtn" onclick="toggleFavoriteFromPage()">
+                <img src="icons/ic-favorites.svg" alt="Favorito" width="24" height="24">
+              </button>
+            </div>
+            <div class="rp-info-card">
+              <h2 class="rp-title" id="rpTitle"></h2>
+              <div class="rp-stats-grid">
+                <div class="rp-stat-item">
+                  <img src="icons/ic-time.svg" alt="" width="24" height="24">
+                  <span id="rpTempo"></span>
+                </div>
+                <div class="rp-stat-item">
+                  <img src="icons/ic-ingredients.svg" alt="" width="24" height="24">
+                  <span id="rpIngredientCount"></span>
+                </div>
+                <div class="rp-stat-item">
+                  <img src="icons/ic-calories.svg" alt="" width="24" height="24">
+                  <span id="rpCalorias"></span>
+                </div>
+                <div class="rp-stat-item" id="rpCostIcons"></div>
+              </div>
+            </div>
+          </div>
+          <div class="rp-section">
+            <div class="rp-section-header">
+              <img src="icons/ic-ingredients.svg" alt="" width="24" height="24">
+              <span class="rp-section-title">Ingredientes</span>
+            </div>
+            <ul class="rp-ingredients" id="rpIngredients"></ul>
+          </div>
+          <div class="rp-section">
+            <div class="rp-section-header">
+              <img src="icons/ic-recipes.svg" alt="" width="24" height="24">
+              <span class="rp-section-title">Passo a passo</span>
+            </div>
+            <ol class="rp-steps" id="rpSteps"></ol>
+          </div>
+        </div>
+        <div id="rpPexelsCredit" class="pexels-credit" style="display:none; padding: 0 16px;"></div>
+      </div>
+
     </div><!-- /filters-panel -->
   </div><!-- /filter-container -->
 
@@ -977,51 +1121,6 @@
 
 </div><!-- /page -->
 
-<!-- =====================================================
-     MODAL DE DETALHE DA RECEITA
-     ===================================================== -->
-<div class="modal-overlay" id="recipeModal" onclick="handleModalClick(event)">
-  <div class="modal">
-    <div class="modal-hero" id="modalHero">
-      <button class="modal-close" onclick="closeModal()">✕</button>
-      <span id="modalEmoji"></span>
-    </div>
-    <div id="modalPexelsCredit" class="pexels-credit modal-pexels-credit" style="display:none"></div>
-    <div class="modal-body">
-      <h2 class="modal-title" id="modalTitle"></h2>
-      <div class="stats-row">
-        <div class="stat-box">
-          <div class="stat-value" id="modalTempo"></div>
-          <div class="stat-label">Tempo</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-value" id="modalCusto"></div>
-          <div class="stat-label">Custo/pessoa</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-value" id="modalCalorias"></div>
-          <div class="stat-label">Calorias</div>
-        </div>
-      </div>
-      <div class="modal-section">
-        <div class="modal-section-title">🛒 Ingredientes</div>
-        <ul class="ingredients-list" id="modalIngredients"></ul>
-      </div>
-      <div class="modal-section">
-        <div class="modal-section-title">👨‍🍳 Preparação</div>
-        <ol class="steps-list" id="modalSteps"></ol>
-      </div>
-      <div class="modal-actions">
-        <button class="btn-modal-primary" id="modalFavBtn" onclick="toggleFavoriteFromModal()">
-          ♡ Guardar nos favoritos
-        </button>
-        <button class="btn-modal-secondary" onclick="openShoppingList()">
-          🛍 Ver lista de compras
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- =====================================================
      MODAL LISTA DE COMPRAS
@@ -1055,7 +1154,7 @@
 const state = {
   tempo: '15',
   restricoes: [],
-  ingredientes: '4',
+  ingredientes: '8',
   recipes: [],
   activeRecipe: null,
   favorites: [],
@@ -1090,6 +1189,8 @@ function navSwitch(view) {
   const hasResults = state.recipes.length > 0;
   const panel = document.getElementById('filtersPanel');
   const fc    = document.querySelector('.filter-container');
+
+  document.getElementById('recipePageSection').classList.remove('visible');
 
   if (view === 'home') {
     document.getElementById('favoritesSection').classList.remove('visible');
@@ -1260,7 +1361,7 @@ function renderRecipes() {
     card.onclick = () => {
       const idx = parseInt(card.dataset.index);
       if (idx !== state.carouselIndex) setCarouselIndex(idx);
-      else openModal(r);
+      else showRecipePage(r);
     };
     track.appendChild(card);
 
@@ -1284,44 +1385,51 @@ function renderRecipes() {
 }
 
 // =========================================================
-// MODAL
+// RECIPE PAGE
 // =========================================================
-function openModal(r) {
+function showRecipePage(r) {
   state.activeRecipe = r;
-  const heroEl   = document.getElementById('modalHero');
-  const emojiEl  = document.getElementById('modalEmoji');
-  const creditEl = document.getElementById('modalPexelsCredit');
-  if (r.imagem && r.pexelsPhotographer) {
-    heroEl.style.backgroundImage    = `url(${r.imagem})`;
-    heroEl.style.backgroundSize     = 'cover';
-    heroEl.style.backgroundPosition = 'center';
+
+  const imgEl    = document.getElementById('rpImage');
+  const emojiEl  = document.getElementById('rpEmoji');
+  const creditEl = document.getElementById('rpPexelsCredit');
+
+  if (r.imagem) {
+    imgEl.src = r.imagem;
+    imgEl.style.display = '';
     emojiEl.style.display = 'none';
-    creditEl.innerHTML    = `Photo by <a href="${r.pexelsUrl}" target="_blank" rel="noopener noreferrer">${r.pexelsPhotographer}</a> on Pexels`;
-    creditEl.style.display = 'block';
+    if (r.pexelsPhotographer) {
+      creditEl.innerHTML = `Photo by <a href="${r.pexelsUrl}" target="_blank" rel="noopener noreferrer">${r.pexelsPhotographer}</a> on Pexels`;
+      creditEl.style.display = '';
+    } else {
+      creditEl.style.display = 'none';
+    }
   } else {
-    heroEl.style.backgroundImage = '';
-    emojiEl.style.display        = '';
-    emojiEl.textContent          = r.emoji;
-    creditEl.style.display       = 'none';
+    imgEl.style.display = 'none';
+    emojiEl.textContent = r.emoji;
+    emojiEl.style.display = '';
+    creditEl.style.display = 'none';
   }
-  document.getElementById('modalTitle').textContent    = r.nome;
-  document.getElementById('modalTempo').textContent    = r.tempo;
-  document.getElementById('modalCusto').textContent    = r.custo;
-  document.getElementById('modalCalorias').textContent = r.calorias;
-  document.getElementById('modalIngredients').innerHTML =
-    r.ingredientes.map(i => `<li class="ingredient-item">${i}</li>`).join('');
-  document.getElementById('modalSteps').innerHTML =
-    r.passos.map((p, i) => `<li class="step-item"><div class="step-num">${i+1}</div><div class="step-text">${p}</div></li>`).join('');
-  updateModalFavBtn();
-  document.getElementById('recipeModal').classList.add('visible');
-  document.body.style.overflow = 'hidden';
-}
-function closeModal() {
-  document.getElementById('recipeModal').classList.remove('visible');
-  document.body.style.overflow = '';
-}
-function handleModalClick(e) {
-  if (e.target === document.getElementById('recipeModal')) closeModal();
+
+  document.getElementById('rpTitle').textContent          = r.nome;
+  document.getElementById('rpTempo').textContent          = r.tempo;
+  document.getElementById('rpIngredientCount').textContent = r.ingredientes.length;
+  document.getElementById('rpCalorias').textContent       = r.calorias;
+  document.getElementById('rpCostIcons').innerHTML        = renderCostIcons(r.nivelCusto || 1);
+
+  document.getElementById('rpIngredients').innerHTML =
+    r.ingredientes.map(i => `<li>${i}</li>`).join('');
+  document.getElementById('rpSteps').innerHTML =
+    r.passos.map(p => `<li>${p}</li>`).join('');
+
+  updatePageFavBtn();
+
+  document.getElementById('recipePageSection').classList.add('visible');
+  document.getElementById('recipesSection').classList.remove('visible');
+  document.getElementById('favoritesSection').classList.remove('visible');
+  document.getElementById('formCard').style.display = 'none';
+  document.getElementById('filtersPanel').classList.add('panel-transparent');
+  document.querySelector('.filter-container').classList.add('carousel-mode');
 }
 
 // =========================================================
@@ -1343,7 +1451,7 @@ function quickToggleFav(i, btn) {
   saveFavorites(); updateFavBadge();
 }
 
-function toggleFavoriteFromModal() {
+function toggleFavoriteFromPage() {
   const r = state.activeRecipe; if (!r) return;
   if (isFavorite(r.nome)) {
     state.favorites = state.favorites.filter(f => f.nome !== r.nome);
@@ -1352,7 +1460,7 @@ function toggleFavoriteFromModal() {
     state.favorites.push(r);
     showToast('❤ Guardado!');
   }
-  saveFavorites(); updateFavBadge(); updateModalFavBtn();
+  saveFavorites(); updateFavBadge(); updatePageFavBtn();
   if (state.recipes.length > 0) {
     const idx = state.recipes.findIndex(rec => rec.nome === r.nome);
     if (idx >= 0) {
@@ -1365,12 +1473,10 @@ function toggleFavoriteFromModal() {
   }
 }
 
-function updateModalFavBtn() {
-  const btn = document.getElementById('modalFavBtn');
-  if (!state.activeRecipe) return;
-  const f = isFavorite(state.activeRecipe.nome);
-  btn.textContent = f ? '💔 Remover dos favoritos' : '♡ Guardar nos favoritos';
-  btn.style.background = f ? '#8b2020' : '';
+function updatePageFavBtn() {
+  const btn = document.getElementById('rpFavBtn');
+  if (!btn || !state.activeRecipe) return;
+  btn.classList.toggle('saved', isFavorite(state.activeRecipe.nome));
 }
 
 function updateFavBadge() {
@@ -1402,7 +1508,7 @@ function renderFavorites() {
           <span class="meta-tag">🔥 ${r.calorias}</span>
         </div>
       </div>`;
-    card.onclick = () => openModal(r);
+    card.onclick = () => showRecipePage(r);
     grid.appendChild(card);
   });
 }
@@ -1458,12 +1564,13 @@ function resetForm() {
   });
   document.querySelectorAll('.chip-restriction').forEach(c => c.classList.remove('checked'));
   state.tempo = '15'; state.pessoas = '1';
-  state.restricoes = []; state.ingredientes = '4'; state.recipes = [];
+  state.restricoes = []; state.ingredientes = '8'; state.recipes = [];
   state.carouselIndex = 0;
   document.getElementById('filtersPanel').classList.remove('panel-transparent');
   document.querySelector('.filter-container').classList.remove('carousel-mode');
   document.getElementById('formCard').style.display = '';
   document.getElementById('recipesSection').classList.remove('visible');
+  document.getElementById('recipePageSection').classList.remove('visible');
   hideError();
   navSwitch('home');
 }
@@ -1517,11 +1624,17 @@ function setCarouselIndex(n) {
 }
 window.addEventListener('resize', positionCarouselCards);
 
+function voltarSugestoes() {
+  document.getElementById('recipePageSection').classList.remove('visible');
+  document.getElementById('recipesSection').classList.add('visible');
+}
+
 function mudarFiltros() {
   document.getElementById('filtersPanel').classList.remove('panel-transparent');
   document.querySelector('.filter-container').classList.remove('carousel-mode');
   document.getElementById('formCard').style.display = '';
   document.getElementById('recipesSection').classList.remove('visible');
+  document.getElementById('recipePageSection').classList.remove('visible');
   hideError();
 }
 

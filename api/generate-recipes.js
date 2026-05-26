@@ -25,8 +25,8 @@ async function fetchPexelsImage(keyword) {
   const key = process.env.PEXELS_API_KEY;
   if (!key) return null;
   const params = new URLSearchParams({
-    query: keyword + ' food',
-    per_page: '1',
+    query: keyword + ' food dish plate close-up',
+    per_page: '5',
     orientation: 'portrait',
   });
   const res = await fetch(`https://api.pexels.com/v1/search?${params}`, {
@@ -34,8 +34,9 @@ async function fetchPexelsImage(keyword) {
   });
   if (!res.ok) return null;
   const data = await res.json();
-  const photo = data.photos?.[0];
-  if (!photo) return null;
+  const photos = data.photos;
+  if (!photos?.length) return null;
+  const photo = photos[Math.floor(Math.random() * photos.length)];
   return {
     imagem: photo.src.large,
     pexelsPhotographer: photo.photographer,
@@ -116,7 +117,8 @@ async function fetchGemini(needed, tempo, ingredientes, restricoes) {
 
   const prompt = `Sugere exactamente ${needed} receitas de refeições principais (almoço ou jantar) para as seguintes condições. NÃO incluas pequeno-almoços, sobremesas, aperitivos, bebidas nem acompanhamentos.
 - Tempo máximo de preparação: ${tempo} minutos
-- Máximo de ingredientes: ${ingredientes} (NÃO contes sal, pimenta, azeite ou água)
+- Máximo de ingredientes: ${ingredientes} no total (conta tudo, incluindo sal, pimenta, azeite, água)
+- IMPORTANTE: o array "ingredientes" deve ter NO MÁXIMO ${ingredientes} itens. Conta antes de responder.
 - ${restricoesTexto}
 
 Responde APENAS com um array JSON válido, sem texto adicional, sem markdown, sem backticks.
@@ -132,7 +134,8 @@ Cada receita deve ter exactamente esta estrutura:
   "tags": ["tag1", "tag2"]
 }
 
-Regras: NÃO incluas sal, pimenta, azeite ou água nos ingredientes. Receitas realistas e portuguesas. nivelCusto deve ser 1 (barato), 2 (médio) ou 3 (caro).`;
+Regras: Receitas realistas e portuguesas. nivelCusto deve ser 1 (barato), 2 (médio) ou 3 (caro).
+REGRA FINAL: cada array "ingredientes" tem OBRIGATORIAMENTE ${ingredientes} ou menos elementos. Verifica antes de responder.`;
 
   const geminiRes = await fetch(
     `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
@@ -154,17 +157,24 @@ Regras: NÃO incluas sal, pimenta, azeite ou água nos ingredientes. Receitas re
   return recipes.map(r => ({ ...r, isAI: true }));
 }
 
+function enforceIngredientLimit(recipes, max) {
+  const limit = parseInt(max, 10);
+  if (isNaN(limit)) return recipes;
+  return recipes.filter(r => Array.isArray(r.ingredientes) && r.ingredientes.length <= limit);
+}
+
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
   const { tempo, ingredientes, restricoes } = req.body;
+  const maxIngr = ingredientes || '20';
 
   try {
     let spoonacularRecipes = [];
     try {
-      spoonacularRecipes = await fetchSpoonacular(tempo, ingredientes || '10', restricoes);
+      spoonacularRecipes = await fetchSpoonacular(tempo, maxIngr, restricoes);
     } catch (_) {
       // Spoonacular failure → fall through to Gemini for all 3
     }
@@ -172,10 +182,11 @@ module.exports = async function handler(req, res) {
     const needed = 3 - spoonacularRecipes.length;
     let geminiRecipes = [];
     if (needed > 0) {
-      geminiRecipes = await fetchGemini(needed, tempo, ingredientes || '10', restricoes);
+      geminiRecipes = await fetchGemini(needed, tempo, maxIngr, restricoes);
     }
 
-    return res.status(200).json([...spoonacularRecipes, ...geminiRecipes]);
+    const all = enforceIngredientLimit([...spoonacularRecipes, ...geminiRecipes], maxIngr);
+    return res.status(200).json(all);
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
