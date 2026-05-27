@@ -146,10 +146,16 @@ Regras: Receitas realistas e portuguesas. nivelCusto deve ser 1 (barato), 2 (mé
     }
   );
 
-  if (!geminiRes.ok) throw new Error(`Gemini error ${geminiRes.status}`);
+  if (!geminiRes.ok) {
+    const errBody = await geminiRes.text().catch(() => '');
+    throw new Error(`Gemini error ${geminiRes.status}: ${errBody}`);
+  }
 
   const data = await geminiRes.json();
-  const text = data.candidates[0].content.parts[0].text;
+  const parts = data.candidates?.[0]?.content?.parts;
+  if (!parts?.length) throw new Error('Gemini: resposta vazia ou bloqueada');
+  const textPart = parts.find(p => !p.thought && p.text) ?? parts[parts.length - 1];
+  const text = textPart.text.replace(/```json\n?|```/g, '').trim();
   const recipes = JSON.parse(text);
   return recipes.map(r => ({ ...r, isAI: true }));
 }
