@@ -117,7 +117,7 @@ async function fetchGemini(needed, tempo, ingredientes, restricoes) {
 
   const prompt = `Sugere exactamente ${needed} receitas de refeições principais (almoço ou jantar) para as seguintes condições. NÃO incluas pequeno-almoços, sobremesas, aperitivos, bebidas nem acompanhamentos.
 - Tempo máximo de preparação: ${tempo} minutos
-- Máximo de ingredientes: ${ingredientes} no total (conta TODOS os ingredientes, incluindo sal, pimenta, azeite, água, etc.)
+- OBRIGATÓRIO: Máximo de ${ingredientes} ingredientes no total. O array "ingredientes" NÃO pode ter mais de ${ingredientes} entradas. Conta TODOS: sal, pimenta, azeite, água, etc.
 - ${restricoesTexto}
 
 Devolve um array JSON com exactamente ${needed} receita(s). Cada receita deve ter exactamente esta estrutura:
@@ -187,12 +187,13 @@ module.exports = async function handler(req, res) {
     const needed = 3 - spoonacularRecipes.length;
     let geminiRecipes = needed > 0 ? await getGeminiWithImages(needed) : [];
 
-    let combined = [...spoonacularRecipes, ...geminiRecipes];
+    const maxIngrNum = parseInt(maxIngr);
+    let combined = [...spoonacularRecipes, ...geminiRecipes].filter(r => r.ingredientes.length <= maxIngrNum);
 
     // Retry once if we still have fewer than 3
     if (combined.length < 3) {
       const retry = await getGeminiWithImages(3 - combined.length);
-      combined = [...combined, ...retry];
+      combined = [...combined, ...retry.filter(r => r.ingredientes.length <= maxIngrNum)];
     }
 
     return res.status(200).json(combined.slice(0, 3));
