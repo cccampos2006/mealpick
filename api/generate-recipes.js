@@ -67,7 +67,6 @@ function mapSpoonacularRecipe(result) {
     ingredientes,
     passos,
     tags: result.diets || [],
-    isAI: false,
   };
 }
 
@@ -157,7 +156,7 @@ Regras: Receitas realistas e portuguesas. nivelCusto deve ser 1 (barato), 2 (mé
   const textPart = parts.find(p => !p.thought && p.text) ?? parts[parts.length - 1];
   const text = textPart.text.replace(/```json\n?|```/g, '').trim();
   const recipes = JSON.parse(text);
-  return recipes.map(r => ({ ...r, isAI: true }));
+  return recipes;
 }
 
 module.exports = async function handler(req, res) {
