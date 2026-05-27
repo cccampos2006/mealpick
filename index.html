@@ -693,19 +693,6 @@
       flex-shrink: 0;
       object-fit: contain;
     }
-    .fav-badge {
-      margin-left: auto;
-      background: var(--green);
-      color: var(--white);
-      font-family: var(--sans);
-      font-size: 11px;
-      font-weight: 700;
-      padding: 1px 7px;
-      border-radius: 20px;
-      display: none;
-    }
-    #navFav .fav-badge[data-count]:not([data-count=""]) { display: inline; }
-    #navFav.active .fav-badge { background: rgba(255,255,255,.3); }
 
     /* =====================================================
        TOAST
@@ -820,13 +807,6 @@
     .cost-icon { width: 24px; height: 24px; margin-right: -8px; }
     .cost-icon:last-child { margin-right: 0; }
     .cost-faded { opacity: 0.5; }
-    .ai-badge {
-      display: inline-block;
-      font-size: 11px; font-family: var(--sans); font-weight: 600;
-      color: #5f5145; background: rgba(95,81,69,0.10);
-      border: 1px solid rgba(95,81,69,0.20); border-radius: 20px;
-      padding: 2px 9px; margin-top: 8px; letter-spacing: 0.01em;
-    }
 
     .carousel-dots {
       display: flex; justify-content: center; gap: 8px;
@@ -1114,7 +1094,6 @@
       <button class="nav-mobile-item" id="navFav" onclick="navSwitch('favoritos')">
         <img class="nav-icon" src="icons/ic-favorites.svg" alt="" width="24" height="24">
         Favoritos
-        <span class="fav-badge" id="favBadge" data-count=""></span>
       </button>
     </nav>
   </div>
@@ -1359,8 +1338,7 @@ function renderRecipes() {
         <div class="carousel-info-item"><img src="icons/ic-ingredients.svg" alt="ingredientes"> ${r.ingredientes.length} ingr.</div>
         <div class="carousel-info-item"><img src="icons/ic-calories.svg" alt="calorias"> ${r.calorias}</div>
         <div class="carousel-info-item">${renderCostIcons(r.nivelCusto || 1)}</div>
-      </div>
-      ${r.isAI ? '<div class="ai-badge">✨ Sugestão IA</div>' : ''}`;
+      </div>`;
     card.onclick = () => {
       const idx = parseInt(card.dataset.index);
       if (idx !== state.carouselIndex) setCarouselIndex(idx);
@@ -1482,12 +1460,7 @@ function updatePageFavBtn() {
   btn.classList.toggle('saved', isFavorite(state.activeRecipe.nome));
 }
 
-function updateFavBadge() {
-  const n  = state.favorites.length;
-  const el = document.getElementById('favBadge');
-  el.dataset.count = n > 0 ? n : '';
-  el.textContent   = n > 0 ? n : '';
-}
+function updateFavBadge() {}
 
 function renderFavorites() {
   const grid  = document.getElementById('favoritesGrid');

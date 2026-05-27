@@ -88,39 +88,13 @@ function buildSpoonacularUrl(tempo, ingredientes, restricoes) {
     type: 'main course',
     addRecipeInformation: 'true',
     addRecipeNutrition: 'true',
+    instructionsRequired: 'true',
     fillIngredients: 'true',
   });
   if (diet) params.set('diet', diet);
   if (intolerances) params.set('intolerances', intolerances);
 
   return `https://api.spoonacular.com/recipes/complexSearch?${params}`;
-}
-
-async function generateSteps(nome, ingredientes) {
-  try {
-    const prompt = `Escreve o passo a passo para a receita "${nome}" com os ingredientes: ${ingredientes.join(', ')}. Devolve APENAS um array JSON de strings com os passos detalhados, sem texto adicional.`;
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.7, maxOutputTokens: 1024 },
-        }),
-      }
-    );
-    if (!res.ok) return [];
-    const data = await res.json();
-    const parts = data.candidates?.[0]?.content?.parts;
-    if (!parts?.length) return [];
-    const textPart = parts.find(p => !p.thought && p.text) ?? parts[parts.length - 1];
-    const text = textPart.text.replace(/```json\n?|```/g, '').trim();
-    const steps = JSON.parse(text);
-    return Array.isArray(steps) ? steps : [];
-  } catch {
-    return [];
-  }
 }
 
 async function fetchSpoonacular(tempo, ingredientes, restricoes) {
@@ -130,17 +104,8 @@ async function fetchSpoonacular(tempo, ingredientes, restricoes) {
   const data = await res.json();
   const recipes = (data.results || []).map(mapSpoonacularRecipe);
   const enhanced = await Promise.all(recipes.map(async (recipe) => {
-    const [pexels, steps] = await Promise.all([
-      fetchPexelsImage(extractKeyword(recipe.nome)),
-      recipe.passos.length === 0
-        ? generateSteps(recipe.nome, recipe.ingredientes)
-        : Promise.resolve(null),
-    ]);
-    return {
-      ...recipe,
-      ...(pexels ?? {}),
-      ...(steps?.length ? { passos: steps } : {}),
-    };
+    const pexels = await fetchPexelsImage(extractKeyword(recipe.nome));
+    return pexels ? { ...recipe, ...pexels } : recipe;
   }));
   return enhanced;
 }
