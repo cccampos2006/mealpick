@@ -327,7 +327,10 @@
        RECIPES SECTION
        ===================================================== */
     .recipes-section { display: none; width: 100%; }
-    .recipes-section.visible { display: block; }
+    .recipes-section.visible,
+    .recipes-section.exiting { display: block; }
+    .recipes-section.visible { animation: carousel-enter 240ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+    .recipes-section.exiting { animation: carousel-exit  180ms cubic-bezier(0.4, 0, 0.6, 1) both; }
 
     .section-header {
       display: flex;
@@ -864,8 +867,33 @@
     /* =====================================================
        RECIPE PAGE
        ===================================================== */
+    @keyframes rp-enter {
+      from { opacity: 0; transform: translateY(36px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes rp-exit {
+      from { opacity: 1; transform: translateY(0); }
+      to   { opacity: 0; transform: translateY(36px); }
+    }
+    @keyframes carousel-exit {
+      from { opacity: 1; transform: scale(1); }
+      to   { opacity: 0; transform: scale(0.97); }
+    }
+    @keyframes carousel-enter {
+      from { opacity: 0; transform: translateY(-14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .recipe-page-section.visible,
+      .recipe-page-section.exiting,
+      .recipes-section.visible,
+      .recipes-section.exiting { animation: none !important; }
+    }
     .recipe-page-section { display: none; width: 100%; }
-    .recipe-page-section.visible { display: flex; flex-direction: column; gap: 8px; }
+    .recipe-page-section.visible,
+    .recipe-page-section.exiting { display: flex; flex-direction: column; gap: 8px; }
+    .recipe-page-section.visible { animation: rp-enter 280ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+    .recipe-page-section.exiting { animation: rp-exit  200ms cubic-bezier(0.4, 0, 0.6, 1) both; }
     .rp-header {
       display: flex; align-items: center;
       padding: 0px 16px 0px 16px;
@@ -1181,6 +1209,21 @@
      ===================================================== -->
 <script>
 // =========================================================
+// ANIMATION HELPER
+// =========================================================
+function animateOut(el, done) {
+  el.classList.add('exiting');
+  let finished = false;
+  const finish = () => {
+    if (finished) return; finished = true;
+    el.classList.remove('visible', 'exiting');
+    if (done) done();
+  };
+  el.addEventListener('animationend', finish, { once: true });
+  setTimeout(finish, 350);
+}
+
+// =========================================================
 // ESTADO GLOBAL
 // =========================================================
 const state = {
@@ -1462,8 +1505,9 @@ function showRecipePage(r) {
 
   updatePageFavBtn();
 
+  const carousel = document.getElementById('recipesSection');
+  if (carousel.classList.contains('visible')) animateOut(carousel, null);
   document.getElementById('recipePageSection').classList.add('visible');
-  document.getElementById('recipesSection').classList.remove('visible');
   document.getElementById('favoritesSection').classList.remove('visible');
   document.getElementById('formCard').style.display = 'none';
   document.getElementById('filtersPanel').classList.add('panel-transparent');
@@ -1666,7 +1710,7 @@ function setCarouselIndex(n) {
 window.addEventListener('resize', positionCarouselCards);
 
 function voltarSugestoes() {
-  document.getElementById('recipePageSection').classList.remove('visible');
+  animateOut(document.getElementById('recipePageSection'), null);
   document.getElementById('recipesSection').classList.add('visible');
 }
 

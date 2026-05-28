@@ -1,0 +1,187 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-05-28T00:00:00Z",
+  "title": "Design System: pickmeal",
+  "extensions": {
+    "colorMeta": {
+      "warm-linen": {
+        "role": "neutral",
+        "displayName": "Warm Linen",
+        "canonical": "oklch(96% 0.006 89)",
+        "tonalRamp": ["#1c1b17", "#35332b", "#5a5549", "#7e7a6d", "#a4a093", "#c9c5b9", "#e2dfd8", "#f4f3ee"]
+      },
+      "card-surface": {
+        "role": "neutral",
+        "displayName": "Card Surface",
+        "canonical": "oklch(99.5% 0.002 89)",
+        "tonalRamp": ["#1a1a18", "#333330", "#555551", "#7a7a76", "#a3a3a0", "#c8c8c5", "#e4e4e2", "#ffffff"]
+      },
+      "kitchen-herb": {
+        "role": "primary",
+        "displayName": "Kitchen Herb",
+        "canonical": "oklch(33% 0.05 147)",
+        "tonalRamp": ["#0b180d", "#162a1e", "#1f3829", "#354d3f", "#496659", "#7a9e87", "#b0caba", "#dff0e8"]
+      },
+      "kitchen-herb-deep": {
+        "role": "primary",
+        "displayName": "Kitchen Herb Deep",
+        "canonical": "oklch(27% 0.045 147)",
+        "tonalRamp": ["#081209", "#101e14", "#18291d", "#2b3f33", "#3d5847", "#698c77", "#a4c4b0", "#d4ecdf"]
+      },
+      "warm-cedar": {
+        "role": "secondary",
+        "displayName": "Warm Cedar",
+        "canonical": "oklch(37% 0.027 50)",
+        "tonalRamp": ["#1a1210", "#2c1f1a", "#3e2d27", "#5f5145", "#7b6d64", "#9f9188", "#c5bbb4", "#e2dcd9"]
+      },
+      "charcoal": {
+        "role": "neutral",
+        "displayName": "Charcoal",
+        "canonical": "oklch(14% 0.003 240)",
+        "tonalRamp": ["#0a0a0c", "#141417", "#1e1e23", "#1e1e1e", "#3b3b42", "#6b6b74", "#a8a8b0", "#e0e0e4"]
+      },
+      "smoke": {
+        "role": "neutral",
+        "displayName": "Smoke",
+        "canonical": "oklch(46% 0.003 240)",
+        "tonalRamp": ["#0d0d0f", "#1c1c1f", "#2d2d31", "#454549", "#6b6b6b", "#8f8f93", "#bababd", "#e6e6e8"]
+      },
+      "pebble": {
+        "role": "neutral",
+        "displayName": "Pebble",
+        "canonical": "oklch(58% 0.002 240)",
+        "tonalRamp": ["#0f0f11", "#1f1f22", "#323237", "#4e4e54", "#6e6e75", "#8a8a8a", "#b5b5b8", "#e2e2e4"]
+      },
+      "divider": {
+        "role": "neutral",
+        "displayName": "Divider",
+        "canonical": "oklch(93% 0.003 240)",
+        "tonalRamp": ["#131315", "#242427", "#3a3a3e", "#5a5a5e", "#7e7e83", "#a4a4a8", "#c8c8cb", "#ebebeb"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Page hero headline only. 'O que vou cozinhar hoje?' One instance per screen. Always in Warm Cedar." },
+      "headline": { "displayName": "Headline", "purpose": "Modal recipe title. One instance per modal surface. Always in Warm Cedar." },
+      "title": { "displayName": "Title", "purpose": "Section headings, carousel card names, filter group labels (at 16px), button text." },
+      "body": { "displayName": "Body", "purpose": "Step instructions, ingredient lists, secondary copy. Mobile container naturally caps line length." },
+      "label": { "displayName": "Label", "purpose": "Stat labels, section eyebrows. All-caps, tracked. Never sentence-case at this role." }
+    },
+    "shadows": [
+      { "name": "ambient-lift", "value": "0px 12px 18px 0px rgba(0,0,0,0.08)", "purpose": "Cards, filter panel, bottom navigation at rest. Structural; separates surface from page." },
+      { "name": "hover-lift", "value": "0px 18px 28px rgba(0,0,0,0.13)", "purpose": "Recipe cards on hover. State-responsive upgrade of ambient-lift." },
+      { "name": "overlay-depth", "value": "0 12px 40px rgba(0,0,0,0.18)", "purpose": "Modals only. Paired with blurred dark backdrop to signal a new attention layer." },
+      { "name": "selection-lift", "value": "0 5px 10px 0 rgba(0,0,0,0.30)", "purpose": "Chip slider indicator only. Punchy vertical shadow that places the indicator physically above the row." }
+    ],
+    "motion": [
+      { "name": "ease-standard", "value": "cubic-bezier(0.4, 0, 0.2, 1)", "purpose": "Chip slider position/width. State transitions that need to feel physical." },
+      { "name": "ease-default", "value": "0.15s ease", "purpose": "Default micro-interaction: hover color shifts, button hover, chip color transitions." },
+      { "name": "ease-reveal", "value": "0.22s ease", "purpose": "Modal entrance (slideUp + fadeIn). Kept short; users do not wait for choreography." },
+      { "name": "ease-carousel", "value": "0.35s cubic-bezier(0.4,0,0.2,1)", "purpose": "Carousel track translateX and card scale/opacity. Smooth but not slow." }
+    ],
+    "breakpoints": [
+      { "name": "grid-2col", "value": "480px", "purpose": "Recipe grid switches from 1 to 2 columns." },
+      { "name": "desktop-center", "value": "600px", "purpose": "Page column max-width 480px, centered. Carousel card switches from 80vw to 400px fixed." }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The main call-to-action. Inria Serif text signals invitation, not command.",
+      "html": "<button class=\"ds-btn-primary\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2\"/><rect x=\"9\" y=\"3\" width=\"6\" height=\"4\" rx=\"2\"/><path d=\"m9 12 2 2 4-4\"/></svg>Mostrar sugestões</button>",
+      "css": "@import url('https://fonts.googleapis.com/css2?family=Inria+Serif:wght@400&display=swap'); .ds-btn-primary { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; height: 48px; padding: 14px 24px; background: #354d3f; border: none; border-radius: 12px; font-family: 'Inria Serif', Georgia, serif; font-size: 16px; font-weight: 400; color: #ffffff; cursor: pointer; transition: background 0.15s ease, transform 0.15s ease; box-sizing: border-box; } .ds-btn-primary svg { flex-shrink: 0; } .ds-btn-primary:hover { background: #2b3f33; transform: translateY(-1px); } .ds-btn-primary:active { transform: translateY(0); } .ds-btn-primary:focus-visible { outline: 2px solid #354d3f; outline-offset: 3px; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Secondary modal action. Transparent at rest; Kitchen Herb on hover.",
+      "html": "<button class=\"ds-btn-ghost\">Ver lista de compras</button>",
+      "css": "@import url('https://fonts.googleapis.com/css2?family=Inter:wght@600&display=swap'); .ds-btn-ghost { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px 20px; background: transparent; border: 1.5px solid rgba(53,77,63,0.3); border-radius: 12px; font-family: 'Inter', system-ui, sans-serif; font-size: 14px; font-weight: 600; color: #1e1e1e; cursor: pointer; transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease; box-sizing: border-box; } .ds-btn-ghost:hover { border-color: #354d3f; color: #354d3f; background: rgba(53,77,63,0.05); } .ds-btn-ghost:focus-visible { outline: 2px solid #354d3f; outline-offset: 3px; }"
+    },
+    {
+      "name": "Single-Select Chip Row",
+      "kind": "chip",
+      "refersTo": "chip-single",
+      "description": "Signature component. A sliding Kitchen Herb indicator glides between options. The animation is JS-driven; this static view shows the selected state.",
+      "html": "<div class=\"ds-chip-row\"><div class=\"ds-chip-slider\" style=\"left:0;width:62px\"></div><button class=\"ds-chip ds-chip-selected\">15 min</button><button class=\"ds-chip\">30 min</button><button class=\"ds-chip\">45 min</button><button class=\"ds-chip\">+60 min</button></div>",
+      "css": "@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400&display=swap'); .ds-chip-row { display: flex; align-items: center; gap: 4px; position: relative; } .ds-chip-slider { position: absolute; top: 0; left: 0; height: 100%; width: 80px; background: #354d3f; border-radius: 24px; box-shadow: 0 5px 10px 0 rgba(0,0,0,0.30); pointer-events: none; z-index: 0; transition: left 0.25s cubic-bezier(0.4,0,0.2,1), width 0.25s cubic-bezier(0.4,0,0.2,1); } .ds-chip { position: relative; z-index: 1; height: 40px; min-width: 64px; padding: 8px 12px; border-radius: 24px; border: none; background: transparent; font-family: 'Inter', system-ui, sans-serif; font-size: 14px; font-weight: 400; color: #6b6b6b; cursor: pointer; white-space: nowrap; transition: color 0.15s ease; box-sizing: border-box; } .ds-chip:hover:not(.ds-chip-selected) { background: rgba(53,77,63,0.08); } .ds-chip-selected { color: #ffffff; }"
+    },
+    {
+      "name": "Multi-Select Restriction Chip",
+      "kind": "chip",
+      "refersTo": "chip-multi",
+      "description": "Dietary restriction toggle. Each chip is independent; green border at rest, green fill when checked.",
+      "html": "<div class=\"ds-restriction-row\"><button class=\"ds-chip-restriction ds-chip-restriction-checked\">Vegetariano</button><button class=\"ds-chip-restriction\">Vegano</button><button class=\"ds-chip-restriction\">Sem glúten</button><button class=\"ds-chip-restriction\">Sem lactose</button></div>",
+      "css": "@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400&display=swap'); .ds-restriction-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; } .ds-chip-restriction { height: 40px; min-width: 80px; padding: 8px 16px; border-radius: 24px; border: 1px solid #354d3f; background: transparent; font-family: 'Inter', system-ui, sans-serif; font-size: 14px; font-weight: 400; color: #354d3f; cursor: pointer; white-space: nowrap; transition: background 0.15s ease, color 0.15s ease; box-sizing: border-box; } .ds-chip-restriction:hover { background: rgba(53,77,63,0.07); } .ds-chip-restriction-checked { background: #354d3f; color: #ffffff; border-color: #354d3f; } .ds-chip-restriction:focus-visible { outline: 2px solid #354d3f; outline-offset: 2px; }"
+    },
+    {
+      "name": "Recipe Carousel Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "The recipe result surface. Active card at full scale; adjacent cards at 87% scale with reduced opacity.",
+      "html": "<div class=\"ds-carousel-card ds-carousel-active\"><div class=\"ds-carousel-image\"><span class=\"ds-carousel-emoji\">🍝</span></div><div class=\"ds-carousel-name\">Massa com Atum e Tomate</div><div class=\"ds-carousel-info\"><div class=\"ds-info-item\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"-1 -1 24 24\" fill=\"none\" stroke=\"#5d5d5d\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><polyline points=\"12 6 12 12 16 14\"/></svg>20 min</div><div class=\"ds-info-item\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#5d5d5d\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2\"/><path d=\"M7 2v20\"/><path d=\"M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Z\"/></svg>4 ingr.</div><div class=\"ds-info-item\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"-2 -1 24 24\" fill=\"#5d5d5d\"><path d=\"M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm0 4a1.5 1.5 0 0 1 1.5 1.5c0 .8-.7 1.5-1.5 1.5a1.5 1.5 0 0 1 0-3zm2 10H10v-1h1.5V11H10v-1h3v5h1.5v1z\"/></svg>480 kcal</div><div class=\"ds-info-item ds-cost\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"18\" height=\"18\" viewBox=\"-4 -3 24 24\" fill=\"none\" stroke=\"#5d5d5d\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"8\" cy=\"8\" r=\"7\"/><path d=\"M8 4v1m0 6v1M6 6.5C6 5.7 6.9 5 8 5s2 .7 2 1.5c0 1-1 1.5-2 1.5s-2 .5-2 1.5C6 10.3 6.9 11 8 11s2-.7 2-1.5\"/></svg><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"18\" height=\"18\" viewBox=\"-4 -3 24 24\" fill=\"none\" stroke=\"#5d5d5d\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" style=\"margin-left:-6px;opacity:0.4\"><circle cx=\"8\" cy=\"8\" r=\"7\"/><path d=\"M8 4v1m0 6v1M6 6.5C6 5.7 6.9 5 8 5s2 .7 2 1.5c0 1-1 1.5-2 1.5s-2 .5-2 1.5C6 10.3 6.9 11 8 11s2-.7 2-1.5\"/></svg><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"18\" height=\"18\" viewBox=\"-4 -3 24 24\" fill=\"none\" stroke=\"#5d5d5d\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" style=\"margin-left:-6px;opacity:0.4\"><circle cx=\"8\" cy=\"8\" r=\"7\"/><path d=\"M8 4v1m0 6v1M6 6.5C6 5.7 6.9 5 8 5s2 .7 2 1.5c0 1-1 1.5-2 1.5s-2 .5-2 1.5C6 10.3 6.9 11 8 11s2-.7 2-1.5\"/></svg></div></div></div>",
+      "css": "@import url('https://fonts.googleapis.com/css2?family=Inria+Serif:wght@400&display=swap'); .ds-carousel-card { width: 320px; background: #ffffff; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px; cursor: pointer; box-sizing: border-box; transform: scale(0.87); opacity: 0.65; box-shadow: 0px 12px 18px 0px rgba(0,0,0,0.1); transition: transform 0.35s ease, opacity 0.35s ease, box-shadow 0.35s ease; } .ds-carousel-active { transform: scale(1); opacity: 1; box-shadow: 0px 20px 28px 0px rgba(0,0,0,0.1); } .ds-carousel-image { min-height: 200px; border-radius: 8px; background: #f4f3ee; display: flex; align-items: center; justify-content: center; } .ds-carousel-emoji { font-size: 80px; line-height: 1; } .ds-carousel-name { font-family: 'Inria Serif', Georgia, serif; font-size: 20px; font-weight: 400; color: #1e1e1e; } .ds-carousel-info { display: grid; grid-template-columns: 1fr 1fr; gap: 0; } .ds-info-item { display: flex; align-items: center; gap: 8px; font-family: 'Inria Serif', Georgia, serif; font-size: 15px; color: #1e1e1e; padding: 8px 0; } .ds-cost { align-items: center; }"
+    },
+    {
+      "name": "Bottom Navigation",
+      "kind": "nav",
+      "refersTo": "nav",
+      "description": "Floating pill nav. Kitchen Herb fill on the active tab; logo mark in the center slot.",
+      "html": "<nav class=\"ds-nav\"><button class=\"ds-nav-item ds-nav-active\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"22\" height=\"22\" viewBox=\"-2 -2 24 24\" fill=\"currentColor\"><path d=\"M9 20H5a2 2 0 0 1-2-2V9l7-7 7 7v9a2 2 0 0 1-2 2h-4v-5H9v5Z\"/></svg>Home</button><div class=\"ds-nav-logo\">🌿</div><button class=\"ds-nav-item\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"22\" height=\"22\" viewBox=\"-1 -3 24 24\" fill=\"currentColor\"><path d=\"M12 2C9.8 2 8 3.8 8 6c0 1.4.7 2.6 1.8 3.3C6.5 10.5 4 13.5 4 17h16c0-3.5-2.5-6.5-5.8-7.7C15.3 8.6 16 7.4 16 6c0-2.2-1.8-4-4-4Z\"/></svg>Favoritos<span class=\"ds-fav-badge\">2</span></button></nav>",
+      "css": "@import url('https://fonts.googleapis.com/css2?family=Inria+Serif:wght@400&display=swap'); .ds-nav { width: 340px; height: 70px; background: #ffffff; border-radius: 16px; box-shadow: 0px 12px 18px 0px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 16px; padding: 11px 13px; box-sizing: border-box; } .ds-nav-item { display: flex; align-items: center; gap: 8px; height: 48px; flex: 1; padding: 8px 16px; border: none; background: transparent; font-family: 'Inria Serif', Georgia, serif; font-size: 16px; font-weight: 400; color: #1e1e1e; border-radius: 12px; cursor: pointer; white-space: nowrap; transition: background 0.15s ease, color 0.15s ease; box-sizing: border-box; } .ds-nav-active { background: #354d3f; color: #ffffff; } .ds-nav-active svg { filter: brightness(0) invert(1); } .ds-nav-logo { height: 48px; width: 56px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 28px; } .ds-fav-badge { margin-left: auto; background: #354d3f; color: #ffffff; font-family: 'Inter', system-ui, sans-serif; font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 20px; } .ds-nav-active .ds-fav-badge { background: rgba(255,255,255,0.3); }"
+    },
+    {
+      "name": "Meta Tag",
+      "kind": "custom",
+      "refersTo": null,
+      "description": "Compact inline label for recipe metadata on favorite-list cards. Warm Linen fill, Smoke text.",
+      "html": "<div class=\"ds-meta-row\"><span class=\"ds-meta-tag\">⏱ 20 min</span><span class=\"ds-meta-tag\">💶 €4</span><span class=\"ds-meta-tag\">🔥 480 kcal</span></div>",
+      "css": "@import url('https://fonts.googleapis.com/css2?family=Inter:wght@600&display=swap'); .ds-meta-row { display: flex; flex-wrap: wrap; gap: 4px; } .ds-meta-tag { font-family: 'Inter', system-ui, sans-serif; font-size: 10px; font-weight: 600; color: #6b6b6b; background: #f4f3ee; padding: 2px 7px; border-radius: 20px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Still Counter",
+    "overview": "A kitchen counter the moment before cooking starts: clear, quiet, ready. Everything is exactly where it needs to be, nothing more. This design system holds that same discipline. The interface exists to make a decision disappear, not to be noticed. Calm confidence over performative motion. Material honesty over polish for its own sake.\n\nThe system is built on parchment and herb. Two surfaces, one accent, no room for decoration. The serif typography carries warmth; Inter carries precision; the two never compete. Hierarchy is established through weight and scale alone. Color does one job: confirm selection and guide action. It does not decorate.\n\nThis is explicitly not a food blog, not a delivery app, not a SaaS dashboard. There are no hero-metric blocks, no gradient accent stripes, no loading sequences that make you watch the app instead of deciding what to eat. The moment a recipe appears, the interface steps aside.",
+    "keyCharacteristics": [
+      "Mobile-first, single-surface layout. No sidebar, no secondary navigation.",
+      "Parchment background with white card surfaces: depth through material contrast, not shadow weight.",
+      "One accent color (Kitchen Herb) used exclusively for selection, confirmation, and primary action.",
+      "Serif type for display and interactive labels; sans-serif for data and metadata.",
+      "Motion is state-only: the chip slider animates between selections; cards scale on hover. Nothing else moves uninvited.",
+      "Spacing varies deliberately for rhythm; equal gutters everywhere is monotony."
+    ],
+    "rules": [
+      { "name": "The One Herb Rule", "body": "Kitchen Herb (#354d3f) is the only color that acts. It appears on selection, confirmation, and primary action. Never on inactive elements, never as a decorative stripe, never as a gradient stop. When it appears, something changed or something needs to change. Its restraint is the signal.", "section": "colors" },
+      { "name": "The Two-Surface Rule", "body": "The layout has exactly two background values: Warm Linen (page) and Card Surface (elevated elements). No tertiary surface, no sidebar tint, no alternate panel color. A third background is drift.", "section": "colors" },
+      { "name": "The No-Role-Swap Rule", "body": "Serifs carry human-facing content; sans-serif carries data. A button in Inria Serif is deliberate. A stat value in Libertinus is always wrong. When in doubt: if a user reads it to make a decision, use serif. If a user scans it for information, use Inter.", "section": "typography" },
+      { "name": "The Flat-At-Rest Rule", "body": "No element has a permanent hero shadow at rest. Shadows respond to state: hover upgrades the shadow, overlay adds depth, selection adds a tight punch. The ambient lift on cards and nav is the single structural exception.", "section": "elevation" },
+      { "name": "The Slider-Only Rule", "body": "Single-select state is communicated by the slider indicator alone. No check icon, no ring, no underline on the selected chip. The slider is the complete signal.", "section": "components" },
+      { "name": "The No-Nested-Card Rule", "body": "Cards never contain cards. If content needs grouping within a card, use a Warm Linen background tint, not a child card surface.", "section": "components" }
+    ],
+    "dos": [
+      "Do use Kitchen Herb (#354d3f) exclusively for selection and primary action. Every appearance signals that something changed or needs to change.",
+      "Do use Inria Serif for buttons and interactive labels. The serif-button is deliberate; it signals a human-facing invitation.",
+      "Do keep exactly two background values: Warm Linen for the page, Card Surface (white) for elevated elements.",
+      "Do reserve Warm Cedar (#5f5145) strictly for display typography: the hero headline and modal recipe title.",
+      "Do keep shadows at ambient weight for resting surfaces. The ambient lift is the ceiling for non-interactive elements.",
+      "Do use Inter for all data and metadata: times, counts, calorie values, cost indicators, stat labels.",
+      "Do invert icons to white (brightness(0) invert(1)) when they appear on Kitchen Herb backgrounds.",
+      "Do vary spacing for rhythm. The app deliberately uses different vertical gaps. Uniform padding everywhere is a signal that spacing was not considered."
+    ],
+    "donts": [
+      "Don't use Kitchen Herb decoratively: no side-stripe border-left accents, no background washes on sections, no gradient overlays.",
+      "Don't use gradient text (background-clip: text with a gradient background). Ever.",
+      "Don't use border-left or border-right greater than 1px as a colored accent stripe on any element.",
+      "Don't create a third background surface. No sidebar tint, no secondary panel color. Two surfaces only.",
+      "Don't use Libertinus Serif Display for UI labels, buttons, or data. Display hierarchy only.",
+      "Don't animate layout properties (height, padding, top, left). Animate transform and opacity only.",
+      "Don't introduce delivery-app patterns: aggressive CTAs, countdown urgency indicators, promotional banners.",
+      "Don't introduce food-blog patterns: infinite-scroll surfaces, identical card grids with icon + heading + text.",
+      "Don't introduce SaaS dashboard patterns: hero-metric blocks, feature-flag banners, modal confirmation dialogs for simple actions.",
+      "Don't add modal dialogs where a toast or inline message suffices.",
+      "Don't use glassmorphism decoratively. The backdrop-filter on the modal overlay is functional; no extensions."
+    ]
+  }
+}
