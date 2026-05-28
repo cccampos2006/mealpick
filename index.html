@@ -433,8 +433,11 @@
     .fav-card-image img { width: 100%; height: 100%; object-fit: cover; }
     .fav-card-emoji-thumb { font-size: 52px; line-height: 1; }
     .fav-card-title { font-family: var(--serif-body); font-size: 14px; color: var(--text); padding: 4px 8px 0; line-height: normal; word-break: break-word; }
-    .fav-card-info { display: grid; grid-template-columns: 1fr 1fr; column-gap: 9px; padding: 0 8px; }
-    .fav-info-row { display: flex; align-items: center; gap: 8px; padding: 4px 0; font-family: var(--serif-body); font-size: 12px; color: var(--text); }
+    .fav-card-info { display: flex; flex-wrap: wrap; gap: 0 8px; align-items: flex-start; padding: 0 8px; }
+    .fav-info-row { display: flex; align-items: center; gap: 8px; padding: 4px 0; font-family: var(--serif-body); font-size: 12px; color: var(--text); flex: 0 0 auto; }
+    .fav-info-row.fav-info-wide   { flex-basis: calc(57% - 4px); }
+    .fav-info-row.fav-info-narrow { flex-basis: calc(43% - 4px); }
+    .fav-info-row.fav-cost-row    { gap: 0; }
     .fav-info-icon { width: 16px; height: 16px; flex-shrink: 0; }
     .fav-card-info .cost-icons { display: flex; align-items: center; }
     .fav-card-info .cost-icon { width: 16px; height: 16px; margin-right: -6px; }
@@ -681,31 +684,33 @@
       gap: 16px;
       padding: 11px 13px;
     }
+    .nav-item-wrapper {
+      display: flex;
+      flex: 1;
+      align-items: center;
+      justify-content: center;
+      min-width: 0;
+    }
     .nav-mobile-item {
       display: flex;
       align-items: center;
-      gap: 8px;
+      justify-content: center;
+      width: 48px;
       height: 48px;
-      flex: 1;
-      min-width: 0;
-      padding: 8px 16px;
+      flex-shrink: 0;
+      padding: 8px;
       border: none;
       background: transparent;
-      font-family: var(--serif-body);
-      font-size: 16px;
       cursor: pointer;
-      color: var(--text);
       border-radius: var(--r-btn);    /* 12px */
-      white-space: nowrap;
-      transition: background var(--transition), color var(--transition);
+      transition: background var(--transition);
     }
     .nav-mobile-item.active {
       background: var(--green);
-      color: var(--white);
     }
     .nav-mobile-item .nav-icon {
-      width: 24px;
-      height: 24px;
+      width: 32px;
+      height: 32px;
       flex-shrink: 0;
       display: block;
       object-fit: contain;
@@ -1126,10 +1131,11 @@
   <!-- NAV CONTAINER — in document flow -->
   <div class="nav-container">
     <nav class="nav-mobile">
-      <button class="nav-mobile-item active" id="navHome" onclick="navSwitch('home')">
-        <img class="nav-icon" src="icons/ic-home.svg" alt="" width="24" height="24">
-        Home
-      </button>
+      <div class="nav-item-wrapper">
+        <button class="nav-mobile-item active" id="navHome" onclick="navSwitch('home')">
+          <img class="nav-icon" src="icons/ic-home.svg" alt="" width="32" height="32">
+        </button>
+      </div>
       <button class="nav-logo-btn" onclick="goHome()" aria-label="Ir para o início">
         <img
           class="nav-center-icon"
@@ -1137,10 +1143,11 @@
           alt=""
         />
       </button>
-      <button class="nav-mobile-item" id="navFav" onclick="navSwitch('favoritos')">
-        <img class="nav-icon" src="icons/ic-favorites.svg" alt="" width="24" height="24">
-        Favoritos
-      </button>
+      <div class="nav-item-wrapper">
+        <button class="nav-mobile-item" id="navFav" onclick="navSwitch('favoritos')">
+          <img class="nav-icon" src="icons/ic-favorites.svg" alt="" width="32" height="32">
+        </button>
+      </div>
     </nav>
   </div>
 
@@ -1528,19 +1535,19 @@ function renderFavorites() {
       <div class="fav-card-image">${imgHtml}</div>
       <div class="fav-card-title">${r.nome}</div>
       <div class="fav-card-info">
-        <div class="fav-info-row">
+        <div class="fav-info-row fav-info-wide">
           <img src="icons/ic-time.svg" class="fav-info-icon" alt="">
           <span>${r.tempo}</span>
         </div>
-        <div class="fav-info-row">
+        <div class="fav-info-row fav-info-narrow">
           <img src="icons/ic-ingredients.svg" class="fav-info-icon" alt="">
           <span>${r.ingredientes.length}</span>
         </div>
-        <div class="fav-info-row">
+        <div class="fav-info-row fav-info-wide">
           <img src="icons/ic-calories.svg" class="fav-info-icon" alt="">
           <span>${r.calorias}</span>
         </div>
-        <div class="fav-info-row">${renderCostIcons(r.nivelCusto || 1)}</div>
+        <div class="fav-info-row fav-info-narrow fav-cost-row">${renderCostIcons(r.nivelCusto || 1)}</div>
       </div>`;
     card.onclick = () => showRecipePage(r);
     grid.appendChild(card);
