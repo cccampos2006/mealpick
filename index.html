@@ -832,6 +832,32 @@
       color: #9ca3af;
       margin-top: -4px;
     }
+    .ai-badge {
+      position: absolute;
+      top: 8px; right: 8px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 6px;
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px; height: 28px;
+      pointer-events: none;
+    }
+    .ai-badge img { width: 20px; height: 20px; display: block; }
+    .rp-ai-badge {
+      position: absolute;
+      top: 8px; right: 60px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 6px;
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px; height: 28px;
+      pointer-events: none;
+    }
+    .rp-ai-badge img { width: 20px; height: 20px; display: block; }
     .pexels-credit a { color: inherit; text-decoration: underline; }
     .modal-pexels-credit { margin: 0; padding: 0px 24px 0; }
     .carousel-card-name {
@@ -1115,6 +1141,9 @@
               <button class="rp-fav-btn" id="rpFavBtn" onclick="toggleFavoriteFromPage()">
                 <img src="icons/ic-favorites.svg" alt="Favorito" width="24" height="24">
               </button>
+              <div class="rp-ai-badge" id="rpAiBadge" style="display:none">
+                <img src="icons/ic-ai.svg" alt="IA">
+              </div>
             </div>
             <div class="rp-info-card">
               <h2 class="rp-title" id="rpTitle"></h2>
@@ -1430,6 +1459,7 @@ function renderRecipes() {
     card.innerHTML = `
       <div class="carousel-image">
         ${r.imagem ? `<img src="${r.imagem}" alt="${r.nome}">` : `<span class="carousel-emoji">${r.emoji}</span>`}
+        ${r.source === 'gemini' ? `<div class="ai-badge"><img src="icons/ic-ai.svg" alt="IA"></div>` : ''}
       </div>
       ${r.pexelsPhotographer ? `<div class="pexels-credit">Photo by <a href="${r.pexelsUrl}" target="_blank" rel="noopener noreferrer">${r.pexelsPhotographer}</a> on Pexels</div>` : ''}
       <div class="carousel-card-name">${r.nome}</div>
@@ -1504,6 +1534,7 @@ function showRecipePage(r) {
     r.passos.map(p => `<li>${p}</li>`).join('');
 
   updatePageFavBtn();
+  document.getElementById('rpAiBadge').style.display = r.source === 'gemini' ? 'flex' : 'none';
 
   const carousel = document.getElementById('recipesSection');
   if (carousel.classList.contains('visible')) animateOut(carousel, null);

@@ -140,7 +140,11 @@ Regras: Receitas realistas e portuguesas. nivelCusto deve ser 1 (barato), 2 (mé
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.8, maxOutputTokens: 4096 },
+        generationConfig: {
+          temperature: 0.8,
+          maxOutputTokens: 8192,
+          thinkingConfig: { thinkingBudget: 0 },
+        },
       }),
     }
   );
@@ -151,8 +155,15 @@ Regras: Receitas realistas e portuguesas. nivelCusto deve ser 1 (barato), 2 (mé
   }
 
   const data = await geminiRes.json();
-  const parts = data.candidates?.[0]?.content?.parts;
-  if (!parts?.length) throw new Error('Gemini: resposta vazia ou bloqueada');
+  const candidate = data.candidates?.[0];
+  if (!candidate) throw new Error('Gemini: resposta vazia ou bloqueada');
+
+  if (candidate.finishReason && candidate.finishReason !== 'STOP') {
+    throw new Error(`Gemini: resposta truncada (finishReason=${candidate.finishReason})`);
+  }
+
+  const parts = candidate.content?.parts;
+  if (!parts?.length) throw new Error('Gemini: sem partes de conteúdo');
   const textPart = parts.find(p => !p.thought && p.text) ?? parts[parts.length - 1];
   const text = textPart.text.replace(/```json\n?|```/g, '').trim();
   const recipes = JSON.parse(text);
@@ -180,7 +191,8 @@ module.exports = async function handler(req, res) {
         const raw = await fetchGemini(count, tempo, maxIngr, restricoes);
         const enhanced = await Promise.all(raw.map(async (recipe) => {
           const pexels = await fetchPexelsImage(extractKeyword(recipe.nome));
-          return pexels ? { ...recipe, ...pexels } : recipe;
+          const withSource = { ...recipe, source: 'gemini' };
+          return pexels ? { ...withSource, ...pexels } : withSource;
         }));
         return enhanced.slice(0, count);
       } catch (err) {
@@ -193,7 +205,10 @@ module.exports = async function handler(req, res) {
     let geminiRecipes = needed > 0 ? await getGeminiWithImages(needed) : [];
 
     const maxIngrNum = parseInt(maxIngr);
-    let combined = [...spoonacularRecipes, ...geminiRecipes].filter(r => r.ingredientes.length <= maxIngrNum);
+    let combined = [
+      ...spoonacularRecipes,
+      ...geminiRecipes.filter(r => r.ingredientes.length <= maxIngrNum),
+    ];
 
     // Retry once if we still have fewer than 3
     if (combined.length < 3) {
