@@ -81,7 +81,7 @@ function buildSpoonacularUrl(tempo, ingredientes, restricoes) {
   const params = new URLSearchParams({
     apiKey: process.env.SPOONACULAR_API_KEY,
     maxReadyTime: tempo,
-    maxIngredients: ingredientes,
+    maxIngredients: parseInt(ingredientes) * 2,
     number: '6',
     sort: 'random',
     type: 'main course',
@@ -134,7 +134,7 @@ Devolve um array JSON com exactamente ${needed} receita(s). Cada receita deve te
 Regras: Receitas realistas e portuguesas. nivelCusto deve ser 1 (barato), 2 (médio) ou 3 (caro).`;
 
   const geminiRes = await fetch(
-    `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
