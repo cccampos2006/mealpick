@@ -82,7 +82,7 @@ function buildSpoonacularUrl(tempo, ingredientes, restricoes) {
     apiKey: process.env.SPOONACULAR_API_KEY,
     maxReadyTime: tempo,
     maxIngredients: ingredientes,
-    number: '3',
+    number: '6',
     sort: 'random',
     type: 'main course',
     addRecipeInformation: 'true',
@@ -206,7 +206,7 @@ module.exports = async function handler(req, res) {
 
     const maxIngrNum = parseInt(maxIngr);
     let combined = [
-      ...spoonacularRecipes,
+      ...spoonacularRecipes.filter(r => r.ingredientes.length <= maxIngrNum).slice(0, 3),
       ...geminiRecipes.filter(r => r.ingredientes.length <= maxIngrNum),
     ];
 
