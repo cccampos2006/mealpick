@@ -46,7 +46,10 @@ async function fetchPexelsImage(keyword) {
 
 function mapSpoonacularRecipe(result) {
   const pricePerServing = result.pricePerServing || 0;
-  const nivelCusto = pricePerServing < 300 ? 1 : pricePerServing < 700 ? 2 : 3;
+  const ingredientCount = (result.extendedIngredients || []).length;
+  const nivelCusto = pricePerServing > 0
+    ? (pricePerServing < 300 ? 1 : pricePerServing < 700 ? 2 : 3)
+    : (ingredientCount <= 5 ? 1 : ingredientCount <= 9 ? 2 : 3);
 
   const calorieEntry = result.nutrition?.nutrients?.find(n => n.name === 'Calories');
   const calorias = calorieEntry ? `${Math.round(calorieEntry.amount)} kcal` : '-- kcal';
@@ -124,14 +127,14 @@ Devolve um array JSON com exactamente ${needed} receita(s). Cada receita deve te
   "nome": "Nome da receita",
   "emoji": "1 emoji representativo",
   "tempo": "X min",
-  "nivelCusto": 1,
+  "nivelCusto": 2,
   "calorias": "XXX kcal",
   "ingredientes": ["ingrediente 1 com quantidade", "ingrediente 2 com quantidade"],
   "passos": ["Passo 1 detalhado", "Passo 2 detalhado"],
   "tags": ["tag1", "tag2"]
 }
 
-Regras: Receitas realistas e portuguesas. nivelCusto deve ser 1 (barato), 2 (médio) ou 3 (caro).`;
+Regras: Receitas realistas e portuguesas. nivelCusto avalia o custo real de cada receita: 1 (barato — ingredientes económicos e comuns), 2 (médio — custo moderado), 3 (caro — ingredientes premium ou em grande quantidade). Deve variar entre receitas conforme o custo real de cada uma.`;
 
   const geminiRes = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
